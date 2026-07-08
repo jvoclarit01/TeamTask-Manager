@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Grid, TextField, Button, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, Card, CardContent, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { getEmployees, getTasks, createTask } from '../services/apiService';
@@ -12,10 +12,6 @@ const AdminDashboard = () => {
   const [assignedUserIds, setAssignedUserIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = async () => {
     try {
       const [tasksRes, employeesRes] = await Promise.all([getTasks(), getEmployees()]);
@@ -27,6 +23,10 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
