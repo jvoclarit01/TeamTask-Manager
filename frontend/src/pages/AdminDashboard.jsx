@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button, MenuItem, Select, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, CircularProgress, Chip, Dialog, Menu, Radio, RadioGroup, FormControlLabel, Pagination, IconButton } from '@mui/material';
+import { Box, TextField, Button, MenuItem, Select, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, CircularProgress, Chip, Dialog, Popover, Radio, RadioGroup, FormControlLabel, Pagination, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -293,112 +293,116 @@ const AdminDashboard = () => {
         )}
       </Box>
 
-      {/* FILTER & SORT DROPDOWN MENU */}
-      <Menu
+      {/* FILTER & SORT DROPDOWN POPOVER */}
+      <Popover
         anchorEl={filterAnchorEl}
         open={Boolean(filterAnchorEl)}
         onClose={handleFilterClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
           sx: {
             width: '280px',
             background: '#0e1424',
             border: '1px solid #1c253d',
-            color: '#f8fafc',
-            p: 3, // generous padding
+            borderRadius: '12px',
+            mt: 1.5,
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
           }
         }}
       >
-        <Typography variant="subtitle2" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', mb: 2, pb: 0.5, borderBottom: '1px solid #1c253d', color: '#f8fafc' }}>
-          Sort & Filters
-        </Typography>
+        <Box sx={{ p: 3 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', mb: 2, pb: 0.5, borderBottom: '1px solid #1c253d', color: '#f8fafc' }}>
+            Sort & Filters
+          </Typography>
 
-        {/* Sort Group */}
-        <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
-          Sort by
-        </Typography>
-        <RadioGroup 
-          value={sortOrder} 
-          onChange={(e) => {
-            setSortOrder(e.target.value);
-            setPage(1);
-          }} 
-          sx={{ mb: 3 }}
-        >
-          <FormControlLabel 
-            value="newest" 
-            control={<Radio size="small" sx={{ color: '#1c253d', '&.Mui-checked': { color: '#10b981' } }} />} 
-            label="Newest First" 
-            componentsProps={{ typography: { fontSize: '0.8rem', color: '#cbd5e1' } }}
-          />
-          <FormControlLabel 
-            value="oldest" 
-            control={<Radio size="small" sx={{ color: '#1c253d', '&.Mui-checked': { color: '#10b981' } }} />} 
-            label="Oldest First" 
-            componentsProps={{ typography: { fontSize: '0.8rem', color: '#cbd5e1' } }}
-          />
-          <FormControlLabel 
-            value="alphabetical" 
-            control={<Radio size="small" sx={{ color: '#1c253d', '&.Mui-checked': { color: '#10b981' } }} />} 
-            label="Alphabetical (A-Z)" 
-            componentsProps={{ typography: { fontSize: '0.8rem', color: '#cbd5e1' } }}
-          />
-        </RadioGroup>
-
-        {/* Status Filter Group */}
-        <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
-          Filter Status
-        </Typography>
-        <FormControl fullWidth size="small" sx={{ mb: 3 }}>
-          <Select
-            value={statusFilter}
+          {/* Sort Group */}
+          <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
+            Sort by
+          </Typography>
+          <RadioGroup 
+            value={sortOrder} 
             onChange={(e) => {
-              setStatusFilter(e.target.value);
+              setSortOrder(e.target.value);
               setPage(1);
-            }}
-            sx={{
-              background: '#0b0f19', // High contrast background
-              fontSize: '0.8rem',
-              color: '#f8fafc',
-              '& fieldset': { borderColor: '#1c253d' },
-              '&:hover fieldset': { borderColor: '#2e3b5e' },
-            }}
+            }} 
+            sx={{ mb: 3 }}
           >
-            <MenuItem value="all" sx={{ fontSize: '0.8rem' }}>All Statuses</MenuItem>
-            <MenuItem value="pending" sx={{ fontSize: '0.8rem' }}>Pending</MenuItem>
-            <MenuItem value="in_progress" sx={{ fontSize: '0.8rem' }}>In Progress</MenuItem>
-            <MenuItem value="completed" sx={{ fontSize: '0.8rem' }}>Completed</MenuItem>
-          </Select>
-        </FormControl>
+            <FormControlLabel 
+              value="newest" 
+              control={<Radio size="small" sx={{ color: '#1c253d', '&.Mui-checked': { color: '#10b981' } }} />} 
+              label="Newest First" 
+              componentsProps={{ typography: { fontSize: '0.8rem', color: '#cbd5e1' } }}
+            />
+            <FormControlLabel 
+              value="oldest" 
+              control={<Radio size="small" sx={{ color: '#1c253d', '&.Mui-checked': { color: '#10b981' } }} />} 
+              label="Oldest First" 
+              componentsProps={{ typography: { fontSize: '0.8rem', color: '#cbd5e1' } }}
+            />
+            <FormControlLabel 
+              value="alphabetical" 
+              control={<Radio size="small" sx={{ color: '#1c253d', '&.Mui-checked': { color: '#10b981' } }} />} 
+              label="Alphabetical (A-Z)" 
+              componentsProps={{ typography: { fontSize: '0.8rem', color: '#cbd5e1' } }}
+            />
+          </RadioGroup>
 
-        {/* Assignee Filter Group */}
-        <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
-          Filter Assignee
-        </Typography>
-        <FormControl fullWidth size="small" sx={{ mb: 1 }}>
-          <Select
-            value={employeeFilter}
-            onChange={(e) => {
-              setEmployeeFilter(e.target.value);
-              setPage(1);
-            }}
-            sx={{
-              background: '#0b0f19', // High contrast background
-              fontSize: '0.8rem',
-              color: '#f8fafc',
-              '& fieldset': { borderColor: '#1c253d' },
-              '&:hover fieldset': { borderColor: '#2e3b5e' },
-            }}
-          >
-            <MenuItem value="all" sx={{ fontSize: '0.8rem' }}>All Employees</MenuItem>
-            {employees.map((emp) => (
-              <MenuItem key={emp.id} value={emp.id} sx={{ fontSize: '0.8rem' }}>
-                {emp.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Menu>
+          {/* Status Filter Group */}
+          <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
+            Filter Status
+          </Typography>
+          <FormControl fullWidth size="small" sx={{ mb: 3 }}>
+            <Select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+              sx={{
+                background: '#0b0f19', // High contrast background
+                fontSize: '0.8rem',
+                color: '#f8fafc',
+                '& fieldset': { borderColor: '#1c253d' },
+                '&:hover fieldset': { borderColor: '#2e3b5e' },
+              }}
+            >
+              <MenuItem value="all" sx={{ fontSize: '0.8rem' }}>All Statuses</MenuItem>
+              <MenuItem value="pending" sx={{ fontSize: '0.8rem' }}>Pending</MenuItem>
+              <MenuItem value="in_progress" sx={{ fontSize: '0.8rem' }}>In Progress</MenuItem>
+              <MenuItem value="completed" sx={{ fontSize: '0.8rem' }}>Completed</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Assignee Filter Group */}
+          <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
+            Filter Assignee
+          </Typography>
+          <FormControl fullWidth size="small" sx={{ mb: 1 }}>
+            <Select
+              value={employeeFilter}
+              onChange={(e) => {
+                setEmployeeFilter(e.target.value);
+                setPage(1);
+              }}
+              sx={{
+                background: '#0b0f19', // High contrast background
+                fontSize: '0.8rem',
+                color: '#f8fafc',
+                '& fieldset': { borderColor: '#1c253d' },
+                '&:hover fieldset': { borderColor: '#2e3b5e' },
+              }}
+            >
+              <MenuItem value="all" sx={{ fontSize: '0.8rem' }}>All Employees</MenuItem>
+              {employees.map((emp) => (
+                <MenuItem key={emp.id} value={emp.id} sx={{ fontSize: '0.8rem' }}>
+                  {emp.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+      </Popover>
 
       {/* CREATE TASK MODAL (Popup Dialog with UI/UX Pro Max guidelines) */}
       <Dialog

@@ -278,62 +278,63 @@ const SidebarAndHeaderLayout = ({ children }) => {
               border: '1px solid #1c253d',
               borderRadius: '12px',
               mt: 1.5,
-              p: 2.5, // generous padding
               boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
             }
           }}
         >
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, pb: 1, borderBottom: '1px solid #1c253d' }}>
-            <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc' }}>
-              Notifications
-            </Typography>
-            {notifications.some(n => !n.read) && (
-              <Button 
-                variant="text" 
-                size="small" 
-                onClick={markAllNotificationsAsRead}
-                sx={{ fontSize: '0.75rem', textTransform: 'none', color: '#10b981', minWidth: 0, p: 0, '&:hover': { color: '#059669', background: 'none' } }}
-              >
-                Mark all as read
-              </Button>
+          <Box sx={{ p: 3 }}> {/* Wrap in a Box to enforce padding boundaries */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, pb: 1, borderBottom: '1px solid #1c253d' }}>
+              <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc' }}>
+                Notifications
+              </Typography>
+              {notifications.some(n => !n.read) && (
+                <Button 
+                  variant="text" 
+                  size="small" 
+                  onClick={markAllNotificationsAsRead}
+                  sx={{ fontSize: '0.75rem', textTransform: 'none', color: '#10b981', minWidth: 0, p: 0, '&:hover': { color: '#059669', background: 'none' } }}
+                >
+                  Mark all as read
+                </Button>
+              )}
+            </Box>
+            {notifications.length === 0 ? (
+              <Typography variant="body2" sx={{ color: '#94a3b8', py: 2, textAlign: 'center', fontSize: '0.8rem' }}>
+                No notifications.
+              </Typography>
+            ) : (
+              <List disablePadding sx={{ maxHeight: '250px', overflowY: 'auto' }}>
+                {notifications.map((n) => (
+                  <ListItem 
+                    key={n.id} 
+                    disablePadding 
+                    sx={{ 
+                      py: 1, 
+                      borderBottom: '1px solid rgba(255,255,255,0.02)',
+                      '&:last-child': { borderBottom: 'none' }
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, width: '100%' }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <Typography variant="body2" sx={{ fontSize: '0.8rem', color: '#f8fafc', fontWeight: n.read ? 500 : 700 }}>
+                          {n.title}
+                        </Typography>
+                        {!n.read && (
+                          <Box sx={{ width: 6, height: 6, bgcolor: '#10b981', borderRadius: '50%', mt: 0.8 }} />
+                        )}
+                      </Box>
+                      <Typography variant="caption" sx={{ color: '#cbd5e1', fontSize: '0.75rem', lineHeight: 1.4 }}>
+                        {n.message}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.65rem', mt: 0.2 }}>
+                        {n.time}
+                      </Typography>
+                    </Box>
+                  </ListItem>
+                ))}
+              </List>
             )}
           </Box>
-          {notifications.length === 0 ? (
-            <Typography variant="body2" sx={{ color: '#94a3b8', py: 2, textAlign: 'center', fontSize: '0.8rem' }}>
-              No notifications.
-            </Typography>
-          ) : (
-            <List disablePadding sx={{ maxHeight: '250px', overflowY: 'auto' }}>
-              {notifications.map((n) => (
-                <ListItem 
-                  key={n.id} 
-                  disablePadding 
-                  sx={{ 
-                    py: 1, 
-                    borderBottom: '1px solid rgba(255,255,255,0.02)',
-                    '&:last-child': { borderBottom: 'none' }
-                  }}
-                >
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, width: '100%' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <Typography variant="body2" sx={{ fontSize: '0.8rem', color: '#f8fafc', fontWeight: n.read ? 500 : 700 }}>
-                        {n.title}
-                      </Typography>
-                      {!n.read && (
-                        <Box sx={{ width: 6, height: 6, bgcolor: '#10b981', borderRadius: '50%', mt: 0.8 }} />
-                      )}
-                    </Box>
-                    <Typography variant="caption" sx={{ color: '#cbd5e1', fontSize: '0.75rem', lineHeight: 1.4 }}>
-                      {n.message}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.65rem', mt: 0.2 }}>
-                      {n.time}
-                    </Typography>
-                  </Box>
-                </ListItem>
-              ))}
-            </List>
-          )}
         </Popover>
 
             {/* User Profile Info (Clickable for switch profile dropdown) */}
