@@ -42,12 +42,12 @@ const EmployeeBoard = () => {
     }
   };
 
-  // 1. Process tasks matching search query
   const filteredTasks = tasks.filter((task) => {
-    const matchesSearch =
-      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesSearch;
+    const query = searchQuery.toLowerCase();
+    const matchesTitle = task.title.toLowerCase().includes(query);
+    const matchesDescription = task.description ? task.description.toLowerCase().includes(query) : false;
+    const matchesEmployee = task.users ? task.users.some((user) => user.name.toLowerCase().includes(query)) : false;
+    return matchesTitle || matchesDescription || matchesEmployee;
   });
 
   const tasksByStatus = {
