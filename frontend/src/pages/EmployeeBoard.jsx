@@ -42,6 +42,7 @@ const EmployeeBoard = () => {
     }
   };
 
+  // 1. Process tasks matching search query
   const filteredTasks = tasks.filter((task) => {
     const query = searchQuery.toLowerCase();
     const matchesTitle = task.title.toLowerCase().includes(query);
@@ -120,7 +121,7 @@ const EmployeeBoard = () => {
                     py: 0.5,
                     borderRadius: '12px',
                     background: '#1e293b',
-                    color: '#94a3b8',
+                    color: '#cbd5e1', // High contrast text color
                     fontWeight: 600,
                   }}
                 >
@@ -136,11 +137,11 @@ const EmployeeBoard = () => {
                   alignItems: 'center', 
                   height: '180px', 
                   width: '100%',
-                  border: '1px dashed rgba(255,255,255,0.03)', 
+                  border: '1px dashed rgba(255,255,255,0.08)', // Brighter empty border
                   borderRadius: '12px',
                   background: 'rgba(255,255,255,0.01)',
                 }}>
-                  <Typography variant="body2" sx={{ color: '#334155', fontWeight: 500 }}>
+                  <Typography variant="body2" sx={{ color: '#cbd5e1', fontWeight: 600 }}> {/* High contrast text color */}
                     No tasks assigned
                   </Typography>
                 </Box>

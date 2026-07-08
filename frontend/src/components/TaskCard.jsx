@@ -8,7 +8,7 @@ const statusColors = {
 };
 
 const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
-  const currentStatus = statusColors[task.status] || { label: task.status, color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.1)' };
+  const currentStatus = statusColors[task.status] || { label: task.status, color: '#cbd5e1', bg: 'rgba(203, 213, 225, 0.1)' };
   const hasDescription = !!task.description && task.description.trim() !== '';
 
   // Calculate mock deadline based on created date + 7 days
@@ -61,7 +61,7 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
 
         {/* Description (Always fully visible) */}
         {hasDescription && (
-          <Typography variant="body2" sx={{ color: '#94a3b8', mb: 3, lineHeight: 1.6, fontSize: '0.85rem' }}>
+          <Typography variant="body2" sx={{ color: '#cbd5e1', mb: 3, lineHeight: 1.6, fontSize: '0.85rem' }}>
             {task.description}
           </Typography>
         )}
@@ -136,9 +136,9 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
                 )}
               </Box>
             ) : (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94a3b8' }}>
-                <CalendarMonthIcon sx={{ fontSize: '0.95rem', color: '#64748b' }} />
-                <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.8rem' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#cbd5e1' }}>
+                <CalendarMonthIcon sx={{ fontSize: '0.95rem', color: '#94a3b8' }} />
+                <Typography variant="body2" sx={{ color: '#cbd5e1', fontWeight: 600, fontSize: '0.8rem' }}>
                   Deadline: {formattedDeadline}
                 </Typography>
               </Box>

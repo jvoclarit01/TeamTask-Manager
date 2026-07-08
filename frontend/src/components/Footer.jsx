@@ -13,17 +13,17 @@ const Footer = () => {
       }}
     >
       <Container maxWidth="lg" sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
-        <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.8rem', fontFamily: '"Fira Code", monospace' }}>
+        <Typography variant="body2" sx={{ color: '#cbd5e1', fontSize: '0.8rem', fontFamily: '"Fira Code", monospace' }}>
           © {new Date().getFullYear()} Workload Hub. All rights reserved.
         </Typography>
         <Box sx={{ display: 'flex', gap: 3 }}>
-          <Link href="#" underline="hover" sx={{ color: '#475569', fontSize: '0.8rem', '&:hover': { color: '#94a3b8' } }}>
+          <Link href="#" underline="hover" sx={{ color: '#94a3b8', fontSize: '0.8rem', '&:hover': { color: '#10b981' } }}>
             Privacy Policy
           </Link>
-          <Link href="#" underline="hover" sx={{ color: '#475569', fontSize: '0.8rem', '&:hover': { color: '#94a3b8' } }}>
+          <Link href="#" underline="hover" sx={{ color: '#94a3b8', fontSize: '0.8rem', '&:hover': { color: '#10b981' } }}>
             Terms of Service
           </Link>
-          <Link href="#" underline="hover" sx={{ color: '#475569', fontSize: '0.8rem', '&:hover': { color: '#94a3b8' } }}>
+          <Link href="#" underline="hover" sx={{ color: '#94a3b8', fontSize: '0.8rem', '&:hover': { color: '#10b981' } }}>
             Support
           </Link>
         </Box>
