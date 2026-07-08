@@ -96,7 +96,7 @@ const EmployeeBoard = () => {
                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'flex-start', // Cross-axis alignment to the start
+                alignItems: 'stretch', // Ensure children stretch to fill full column width
               }}
             >
               {/* Column Header */}
@@ -120,7 +120,7 @@ const EmployeeBoard = () => {
                 </Typography>
               </Box>
 
-              {/* Task Cards List (Flex container aligning items to start) */}
+              {/* Task Cards List (Flex container stretching items to full width) */}
               {columnTasks.length === 0 ? (
                 <Box sx={{ 
                   display: 'flex', 
@@ -144,8 +144,9 @@ const EmployeeBoard = () => {
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'flex-start', // Align cards to the start
-                    pr: 0.5,
+                    alignItems: 'stretch', // Ensure cards stretch to fill full box width
+                    p: 1.5,                 // Padding on all sides
+                    pr: 1,                  // Extra right padding for scrollbar
                     '&::-webkit-scrollbar': { width: '6px' }, 
                     '&::-webkit-scrollbar-thumb': { background: '#1e293b', borderRadius: '3px' } 
                   }}
