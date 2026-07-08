@@ -1,0 +1,36 @@
+| Type                    | Convention                  | Example                |
+| ----------------------- | --------------------------- | ---------------------- |
+| Laravel Models          | PascalCase Singular         | User.php               |
+| Laravel Controllers     | PascalCase + Controller     | UserController.php     |
+| Laravel API Controllers | `Api/` folder               | Api/UserController.php |
+| Laravel Requests        | Action + Model + Request    | StoreUserRequest.php   |
+| Laravel Middleware      | PascalCase                  | CheckAdmin.php         |
+| Laravel Policies        | Model + Policy              | UserPolicy.php         |
+| Laravel Jobs            | Verb + Subject              | SendEmailJob.php       |
+| Laravel Events          | Action + Subject            | UserRegistered.php     |
+| Laravel Listeners       | Verb phrase                 | SendWelcomeEmail.php   |
+| Database Tables         | plural snake_case           | order_items            |
+| Migrations              | timestamp + snake_case      | create_users_table.php |
+| Seeders                 | PascalCase + Seeder         | UserSeeder.php         |
+| Factories               | Model + Factory             | UserFactory.php        |
+| API Routes              | plural REST endpoints       | /users/{id}            |
+| React Components        | PascalCase                  | UserCard.jsx           |
+| React Hooks             | camelCase starting with use | useAuth.js             |
+| React Pages             | PascalCase                  | Dashboard.jsx          |
+| React Services          | camelCase                   | userService.js         |
+| React Utils             | camelCase                   | formatDate.js          |
+| React Context           | PascalCase + Context        | AuthContext.jsx        |
+| Constants               | UPPER_SNAKE_CASE            | API_BASE_URL           |
+| Folders                 | kebab-case or lowercase     | user-management        |
+
+Rule of Thumb
+Backend → PascalCase classes
+Frontend Components → PascalCase
+Functions/Helpers → camelCase
+Database → snake_case
+Constants → UPPER_SNAKE_CASE
+Folders → kebab-case
+
+Note:
+Apply the naming conventions on new files and folders. Slowly update the other files and folders.
+For the ManPro Subscription, files and folders will be updated during the Optimization Period
