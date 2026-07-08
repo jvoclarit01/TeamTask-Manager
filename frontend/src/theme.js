@@ -69,6 +69,7 @@ const theme = createTheme({
           textTransform: 'none',
           fontWeight: 700, // Make button labels bold and premium
           fontFamily: '"Outfit", sans-serif', // Brand typography Pairing
+          lineHeight: 1.2, // Restrict line-height for vertical centering
           transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
           '&:active': {
             transform: 'scale(0.97)', // Tap physics click feedback
