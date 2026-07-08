@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import { Card, CardContent, Typography, Box, Chip, Avatar, Tooltip, IconButton, Collapse, Button } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Card, CardContent, Typography, Box, Chip, Avatar, Tooltip, Button } from '@mui/material';
 
 const statusColors = {
   pending: { label: 'Pending', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
@@ -9,7 +7,6 @@ const statusColors = {
 };
 
 const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
-  const [expanded, setExpanded] = useState(false);
   const currentStatus = statusColors[task.status] || { label: task.status, color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.1)' };
   const hasDescription = !!task.description && task.description.trim() !== '';
 
@@ -41,21 +38,6 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
         {/* Top Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexGrow: 1, pr: 1 }}>
-            {hasDescription && (
-              <IconButton
-                onClick={() => setExpanded(!expanded)}
-                size="small"
-                sx={{
-                  color: '#94a3b8',
-                  p: 0.5,
-                  mr: 0.5,
-                  transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                  transition: 'transform 0.2s ease',
-                }}
-              >
-                <ExpandMoreIcon fontSize="small" />
-              </IconButton>
-            )}
             <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.05rem', color: '#f8fafc' }}>
               {task.title}
             </Typography>
@@ -76,17 +58,15 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
           />
         </Box>
 
-        {/* Description (Collapsible) */}
+        {/* Description (Always fully visible) */}
         {hasDescription && (
-          <Collapse in={expanded} timeout="auto" unmountOnExit sx={{ mb: 3 }}>
-            <Typography variant="body2" sx={{ color: '#94a3b8', lineHeight: 1.6, fontSize: '0.85rem', pt: 0.5 }}>
-              {task.description}
-            </Typography>
-          </Collapse>
+          <Typography variant="body2" sx={{ color: '#94a3b8', mb: 3, lineHeight: 1.6, fontSize: '0.85rem' }}>
+            {task.description}
+          </Typography>
         )}
 
         {/* Footer Area */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mt: 1 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mt: hasDescription ? 0 : 2 }}>
           {/* Assigned Avatars List with Names */}
           <Box>
             <Box sx={{ display: 'flex', gap: 1.5 }}>
