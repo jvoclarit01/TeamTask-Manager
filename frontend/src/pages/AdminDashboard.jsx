@@ -11,22 +11,30 @@ const AdminDashboard = () => {
   const [description, setDescription] = useState('');
   const [assignedUserIds, setAssignedUserIds] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const loadData = async () => {
-    try {
-      const [tasksRes, employeesRes] = await Promise.all([getTasks(), getEmployees()]);
-      setTasks(tasksRes.data);
-      setEmployees(employeesRes.data);
-    } catch (err) {
-      console.error('Failed to load Admin workload data', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
+    let active = true;
+    const loadData = async () => {
+      try {
+        const [tasksRes, employeesRes] = await Promise.all([getTasks(), getEmployees()]);
+        if (active) {
+          setTasks(tasksRes.data);
+          setEmployees(employeesRes.data);
+        }
+      } catch (err) {
+        console.error('Failed to load Admin workload data', err);
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
     loadData();
-  }, []);
+    return () => {
+      active = false;
+    };
+  }, [refreshKey]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +49,7 @@ const AdminDashboard = () => {
       setTitle('');
       setDescription('');
       setAssignedUserIds([]);
-      loadData();
+      setRefreshKey((prev) => prev + 1);
     } catch (err) {
       console.error('Failed to assign task', err);
     }
