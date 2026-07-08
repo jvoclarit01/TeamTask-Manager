@@ -1,6 +1,8 @@
-import { Card, CardContent, Typography, Box, Chip, Button, AvatarGroup, Avatar, Tooltip } from '@mui/material';
+import { useState } from 'react';
+import { Card, CardContent, Typography, Box, Chip, Button, AvatarGroup, Avatar, Tooltip, IconButton, Collapse } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const statusColors = {
   pending: { label: 'Pending', color: 'warning' },
@@ -9,29 +11,52 @@ const statusColors = {
 };
 
 const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
+  const [expanded, setExpanded] = useState(false);
   const currentStatus = statusColors[task.status] || { label: task.status, color: 'default' };
+  const hasDescription = !!task.description && task.description.trim() !== '';
 
   return (
     <Card sx={{ mb: 2.5 }}>
       <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-          <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1.3, color: '#f8fafc' }}>
-            {task.title}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexGrow: 1, pr: 1 }}>
+            {hasDescription && (
+              <IconButton
+                onClick={() => setExpanded(!expanded)}
+                size="small"
+                sx={{
+                  color: '#94a3b8',
+                  p: 0.5,
+                  mr: 0.5,
+                  transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s ease',
+                }}
+              >
+                <ExpandMoreIcon fontSize="small" />
+              </IconButton>
+            )}
+            <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1.3, color: '#f8fafc' }}>
+              {task.title}
+            </Typography>
+          </Box>
           <Chip
             label={currentStatus.label}
             color={currentStatus.color}
             size="small"
             variant="outlined"
-            sx={{ fontFamily: '"Fira Code", monospace', fontWeight: 600, fontSize: '0.7rem' }}
+            sx={{ fontFamily: '"Fira Code", monospace', fontWeight: 600, fontSize: '0.7rem', flexShrink: 0 }}
           />
         </Box>
 
-        <Typography variant="body2" sx={{ color: '#94a3b8', minHeight: '38px', mb: 2.5, lineHeight: 1.5 }}>
-          {task.description || 'No description provided.'}
-        </Typography>
+        {hasDescription && (
+          <Collapse in={expanded} timeout="auto" unmountOnExit sx={{ mb: 2 }}>
+            <Typography variant="body2" sx={{ color: '#94a3b8', lineHeight: 1.5, pt: 0.5 }}>
+              {task.description}
+            </Typography>
+          </Collapse>
+        )}
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: hasDescription && expanded ? 0 : 1 }}>
           {/* Assigned Avatars */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography variant="caption" sx={{ mr: 1, color: '#64748b', fontWeight: 500 }}>
