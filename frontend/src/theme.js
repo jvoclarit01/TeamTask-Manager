@@ -4,8 +4,8 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     background: {
-      default: '#030712', // Darker black-tinted neutral
-      paper: '#0b1329',   // Deep dark card tone
+      default: '#0b0f19', // Main background #0B0F19
+      paper: '#131b2e',   // Column bg #131B2E
     },
     primary: {
       main: '#10b981',    // Emerald Green

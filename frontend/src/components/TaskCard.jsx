@@ -1,4 +1,5 @@
 import { Card, CardContent, Typography, Box, Chip, Avatar, Tooltip, Button } from '@mui/material';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 const statusColors = {
   pending: { label: 'Pending', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
@@ -23,18 +24,18 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
     <Card 
       sx={{ 
         mb: 2, 
-        background: '#0e1424', 
-        border: '1px solid #1c253d',
-        borderRadius: '12px',
+        background: '#1e293b', // Elevated task cards #1E293B
+        border: '1px solid #2e3b5e',
+        borderRadius: '16px', // rounded-xl
         boxShadow: 'none',
         transition: 'all 0.2s ease',
         '&:hover': {
-          borderColor: 'rgba(59, 130, 246, 0.3)',
+          borderColor: 'rgba(16, 185, 129, 0.3)',
           transform: 'translateY(-2px)'
         }
       }}
     >
-      <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
+      <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}> {/* generous 24px padding */}
         {/* Top Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexGrow: 1, pr: 1 }}>
@@ -80,6 +81,7 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
                         bgcolor: '#3b82f6', 
                         fontSize: '0.75rem', 
                         fontWeight: 'bold',
+                        border: '2px solid #1e293b', // matches card background
                         mb: 0.5 
                       }}
                     >
@@ -94,7 +96,7 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
             </Box>
           </Box>
 
-          {/* Right Side: Action Buttons for Employees or Deadline */}
+          {/* Right Side: Action Buttons for Employees or Deadline with calendar icon */}
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
             {isEmployeeView && task.status !== 'completed' ? (
               <Box>
@@ -140,13 +142,16 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
                 )}
               </Box>
             ) : (
-              <Box sx={{ textAlign: 'right' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                 <Typography variant="caption" sx={{ color: '#475569', display: 'block', mb: 0.5, fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase' }}>
                   Deadline
                 </Typography>
-                <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.8rem' }}>
-                  {formattedDeadline}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94a3b8' }}>
+                  <CalendarMonthIcon sx={{ fontSize: '0.9rem', color: '#475569' }} />
+                  <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.8rem' }}>
+                    {formattedDeadline}
+                  </Typography>
+                </Box>
               </Box>
             )}
           </Box>

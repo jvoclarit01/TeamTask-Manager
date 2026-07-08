@@ -38,7 +38,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
   ];
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', background: '#090d16' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', background: '#0b0f19' }}>
       {/* Left Sidebar */}
       <Drawer
         variant="permanent"
@@ -48,7 +48,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
-            background: '#090d16',
+            background: '#0b0f19',
             borderRight: '1px solid #141b2d',
             display: 'flex',
             flexDirection: 'column',
@@ -130,7 +130,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
             alignItems: 'center',
             justifyContent: 'space-between',
             px: 4,
-            background: '#090d16',
+            background: '#0b0f19',
           }}
         >
           {/* Search Box */}
