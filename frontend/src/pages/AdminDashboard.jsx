@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import TaskCard from '../components/TaskCard';
 
 const AdminDashboard = () => {
-  const { searchQuery } = useAuth();
+  const { searchQuery, addNotification } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [title, setTitle] = useState('');
@@ -69,6 +69,7 @@ const AdminDashboard = () => {
         due_date: dueDate || null,
         user_ids: assignedUserIds,
       });
+      addNotification('Task Created', `Admin assigned a new task: "${title}"`);
       setTitle('');
       setDescription('');
       setDueDate('');
@@ -108,6 +109,7 @@ const AdminDashboard = () => {
         due_date: editDueDate || null,
         user_ids: editAssignedUserIds,
       });
+      addNotification('Task Updated', `Admin updated task details: "${editTitle}"`);
       setEditingTask(null);
       setRefreshKey((prev) => prev + 1);
     } catch (err) {
