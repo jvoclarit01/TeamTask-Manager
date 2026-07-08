@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Grid, Paper, CircularProgress } from '@mui/material';
+import { Box, Typography, Paper, CircularProgress } from '@mui/material';
 import { getMyTasks, updateTaskStatus } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import TaskCard from '../components/TaskCard';
@@ -57,12 +57,21 @@ const EmployeeBoard = () => {
   }
 
   return (
-    <Box sx={{ py: 4 }}>
+    <Box sx={{ py: 4, width: '100%' }}>
       <Typography variant="h5" sx={{ mb: 4, fontWeight: 'bold', color: '#f8fafc' }}>
         My Work Board
       </Typography>
 
-      <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
+      {/* CSS Grid layout sharing equal width, aligned to the far left */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
+          gap: 3,
+          width: '100%',
+          justifyContent: 'start',
+        }}
+      >
         {['pending', 'in_progress', 'completed'].map((status) => {
           const title =
             status === 'pending'
@@ -73,84 +82,88 @@ const EmployeeBoard = () => {
           const columnTasks = tasksByStatus[status] || [];
 
           return (
-            <Grid item xs={12} md={4} key={status}>
-              <Paper
-                sx={{
-                  p: 2.5,
-                  background: '#131b2e', // Column background #131B2E
-                  border: '1px solid #1c253d',
-                  minHeight: '600px',
-                  maxHeight: '600px', // Maximum height constraint
-                  maxWidth: '420px', // Maximum width constraint
+            <Paper
+              key={status}
+              sx={{
+                p: 2.5,
+                background: '#131b2e', // Column background #131B2E
+                border: '1px solid #1c253d',
+                minHeight: '600px',
+                maxHeight: '600px', // Maximum height constraint
+                maxWidth: '420px', // Maximum width constraint
+                width: '100%',
+                borderRadius: '16px',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start', // Cross-axis alignment to the start
+              }}
+            >
+              {/* Column Header */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, width: '100%', flexShrink: 0 }}>
+                <Typography variant="h6" sx={{ fontSize: '1rem', color: '#f8fafc', fontWeight: 700 }}>
+                  {title}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontFamily: '"Fira Code", monospace',
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: '12px',
+                    background: '#1e293b',
+                    color: '#94a3b8',
+                    fontWeight: 600,
+                  }}
+                >
+                  {columnTasks.length}
+                </Typography>
+              </Box>
+
+              {/* Task Cards List (Flex container aligning items to start) */}
+              {columnTasks.length === 0 ? (
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  height: '180px', 
                   width: '100%',
-                  margin: '0 auto',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                {/* Column Header */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                  <Typography variant="h6" sx={{ fontSize: '1rem', color: '#f8fafc', fontWeight: 700 }}>
-                    {title}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontFamily: '"Fira Code", monospace',
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: '12px',
-                      background: '#1e293b',
-                      color: '#94a3b8',
-                      fontWeight: 600,
-                    }}
-                  >
-                    {columnTasks.length}
+                  border: '1px dashed rgba(255,255,255,0.03)', 
+                  borderRadius: '12px',
+                  background: 'rgba(255,255,255,0.01)',
+                }}>
+                  <Typography variant="body2" sx={{ color: '#334155', fontWeight: 500 }}>
+                    No tasks assigned
                   </Typography>
                 </Box>
-
-                {/* Task Cards List */}
-                {columnTasks.length === 0 ? (
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    height: '180px', 
-                    border: '1px dashed rgba(255,255,255,0.03)', 
-                    borderRadius: '12px',
-                    background: 'rgba(255,255,255,0.01)',
-                  }}>
-                    <Typography variant="body2" sx={{ color: '#334155', fontWeight: 500 }}>
-                      No tasks assigned
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Box 
-                    sx={{ 
-                      overflowY: 'auto', 
-                      flexGrow: 1, 
-                      pr: 0.5,
-                      '&::-webkit-scrollbar': { width: '6px' }, 
-                      '&::-webkit-scrollbar-thumb': { background: '#1e293b', borderRadius: '3px' } 
-                    }}
-                  >
-                    {columnTasks.map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        isEmployeeView={true}
-                        onStatusChange={handleStatusChange}
-                      />
-                    ))}
-                  </Box>
-                )}
-              </Paper>
-            </Grid>
+              ) : (
+                <Box 
+                  sx={{ 
+                    overflowY: 'auto', 
+                    flexGrow: 1, 
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start', // Align cards to the start
+                    pr: 0.5,
+                    '&::-webkit-scrollbar': { width: '6px' }, 
+                    '&::-webkit-scrollbar-thumb': { background: '#1e293b', borderRadius: '3px' } 
+                  }}
+                >
+                  {columnTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      isEmployeeView={true}
+                      onStatusChange={handleStatusChange}
+                    />
+                  ))}
+                </Box>
+              )}
+            </Paper>
           );
         })}
-      </Grid>
+      </Box>
     </Box>
   );
 };
