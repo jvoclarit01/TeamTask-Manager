@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Grid, TextField, Button, MenuItem, Select, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, Card, CardContent, CircularProgress, Chip } from '@mui/material';
+import { Box, TextField, Button, MenuItem, Select, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, Card, CardContent, CircularProgress, Chip } from '@mui/material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { getEmployees, getTasks, createTask } from '../services/apiService';
@@ -77,23 +77,19 @@ const AdminDashboard = () => {
   }
 
   return (
-    <Box sx={{ py: 1 }}>
+    <Box sx={{ py: 1, maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
       {/* Title Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ mb: 4 }}>
         <Typography variant="h5" sx={{ fontWeight: 800, color: '#f8fafc' }}>
           Task Management Dashboard
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#94a3b8' }}>
-          <CalendarMonthIcon fontSize="small" />
-          <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
-            {formattedDate}
-          </Typography>
-        </Box>
       </Box>
 
-      <Grid container spacing={4}>
-        {/* CREATE NEW TASK Panel (4.2 columns) */}
-        <Grid item xs={12} md={4.2}>
+      {/* 40% / 60% Split Layout */}
+      <Box sx={{ display: 'flex', gap: 4, width: '100%', alignItems: 'flex-start' }}>
+        
+        {/* CREATE NEW TASK Panel (40% width) */}
+        <Box sx={{ width: '40%', maxHeight: '620px', flexShrink: 0 }}>
           <Card sx={{ background: '#0e1424', border: '1px solid #1c253d', borderRadius: '12px' }}>
             <CardContent sx={{ p: 3.5 }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 3.5, color: '#f8fafc', textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.75rem' }}>
@@ -236,11 +232,19 @@ const AdminDashboard = () => {
               </form>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
 
-        {/* TEAM TASK CARDS Panel (7.8 columns) */}
-        <Grid item xs={12} md={7.8}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        {/* TEAM TASK CARDS Panel (60% width) */}
+        <Box sx={{ width: '60%', height: '620px', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+          {/* Date sits at the top right of the task card container */}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, color: '#94a3b8', mb: 1.5, flexShrink: 0 }}>
+            <CalendarMonthIcon sx={{ fontSize: '1rem' }} />
+            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
+              {formattedDate}
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexShrink: 0 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#f8fafc', textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.75rem' }}>
                 Team Task Cards
@@ -266,7 +270,8 @@ const AdminDashboard = () => {
               py: 12, 
               border: '1px dashed #1c253d', 
               borderRadius: '12px',
-              background: 'rgba(14, 20, 36, 0.4)'
+              background: 'rgba(14, 20, 36, 0.4)',
+              flexGrow: 1
             }}>
               <Typography variant="h6" sx={{ color: '#94a3b8', mb: 1, fontWeight: 'bold', fontSize: '1rem' }}>
                 All Clear!
@@ -276,14 +281,26 @@ const AdminDashboard = () => {
               </Typography>
             </Box>
           ) : (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: 2, 
+                overflowY: 'auto', 
+                flexGrow: 1, 
+                pr: 0.5,
+                '&::-webkit-scrollbar': { width: '6px' }, 
+                '&::-webkit-scrollbar-thumb': { background: '#1c253d', borderRadius: '3px' } 
+              }}
+            >
               {tasks.map((task) => (
                 <TaskCard key={task.id} task={task} />
               ))}
             </Box>
           )}
-        </Grid>
-      </Grid>
+        </Box>
+
+      </Box>
     </Box>
   );
 };
