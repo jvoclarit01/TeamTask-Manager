@@ -151,7 +151,7 @@ const AdminDashboard = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'i', gap: 1, color: '#94a3b8' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#94a3b8' }}>
             <CalendarMonthIcon fontSize="small" />
             <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
               {formattedDate}
