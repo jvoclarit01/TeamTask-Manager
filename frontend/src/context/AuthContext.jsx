@@ -2,6 +2,9 @@ import { createContext, useState, useContext } from 'react';
 
 const AuthContext = createContext(null);
 
+const DEFAULT_ADMIN = { id: 999, name: 'Alice Admin', email: 'admin@company.com', role: 'admin' };
+const DEFAULT_EMPLOYEE = { id: 3, name: 'Bob Employee', email: 'bob@company.com', role: 'employee' };
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('user_session');
@@ -10,12 +13,10 @@ export const AuthProvider = ({ children }) => {
         return JSON.parse(savedUser);
       } catch (error) {
         console.error('Error parsing user session from localStorage:', error);
-        localStorage.removeItem('user_session');
       }
     }
-    return null;
+    return DEFAULT_ADMIN; // Default to Admin instead of null
   });
-  const [loading] = useState(false);
 
   const login = (userData) => {
     setUser(userData);
@@ -27,8 +28,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user_session');
   };
 
+  const switchRole = (newRole) => {
+    const newUser = newRole === 'admin' ? DEFAULT_ADMIN : DEFAULT_EMPLOYEE;
+    setUser(newUser);
+    localStorage.setItem('user_session', JSON.stringify(newUser));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, switchRole }}>
       {children}
     </AuthContext.Provider>
   );

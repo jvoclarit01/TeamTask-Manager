@@ -1,19 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
-import { ThemeProvider, CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, InputBase, Badge, Container, IconButton } from '@mui/material';
+import { ThemeProvider, CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, InputBase, Badge, Container, IconButton, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import PeopleIcon from '@mui/icons-material/People';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import WorkIcon from '@mui/icons-material/Work';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
-import SettingsIcon from '@mui/icons-material/Settings';
-import LogoutIcon from '@mui/icons-material/Logout';
 import theme from './theme';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import EmployeeBoard from './pages/EmployeeBoard';
 import Footer from './components/Footer';
@@ -21,23 +13,23 @@ import Footer from './components/Footer';
 const DRAWER_WIDTH = 240;
 
 const SidebarAndHeaderLayout = ({ children }) => {
-  const { user, logout } = useAuth();
+  const { user, switchRole } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   if (!user) return <Box sx={{ width: '100%' }}>{children}</Box>;
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleRoleChange = (event, newRole) => {
+    if (!newRole) return;
+    switchRole(newRole);
+    if (newRole === 'admin') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/employee/board');
+    }
   };
 
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard-placeholder' },
-    { text: 'Employees', icon: <PeopleIcon />, path: '/employees-placeholder' },
-    { text: 'Performance', icon: <AssessmentIcon />, path: '/performance-placeholder' },
-    { text: 'Attendance', icon: <CalendarMonthIcon />, path: '/attendance-placeholder' },
-    { text: 'Recruitment', icon: <WorkIcon />, path: '/recruitment-placeholder' },
     { 
       text: user.role === 'admin' ? 'Tasks (Active)' : 'My Work Board', 
       icon: <PlaylistAddCheckIcon />, 
@@ -125,45 +117,6 @@ const SidebarAndHeaderLayout = ({ children }) => {
             })}
           </List>
         </Box>
-
-        {/* Bottom Actions */}
-        <Box>
-          <List sx={{ px: 0, pb: 0 }}>
-            <ListItem disablePadding sx={{ mb: 0.5 }}>
-              <ListItemButton
-                sx={{
-                  borderRadius: '8px',
-                  py: 1,
-                  px: 1.5,
-                  color: '#94a3b8',
-                  '&:hover': { color: '#f8fafc', background: 'rgba(255, 255, 255, 0.03)' },
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
-                  <SettingsIcon />
-                </ListItemIcon>
-                <ListItemText primary="settings" primaryTypographyProps={{ fontSize: '0.85rem' }} />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={handleLogout}
-                sx={{
-                  borderRadius: '8px',
-                  py: 1,
-                  px: 1.5,
-                  color: '#ef4444',
-                  '&:hover': { background: 'rgba(239, 68, 68, 0.05)' },
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
-                  <LogoutIcon />
-                </ListItemIcon>
-                <ListItemText primary="Logout" primaryTypographyProps={{ fontSize: '0.85rem' }} />
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </Box>
       </Drawer>
 
       {/* Main Content Area */}
@@ -189,7 +142,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
               borderRadius: '20px',
               px: 2,
               py: 0.5,
-              width: '320px',
+              width: '300px',
               border: '1px solid #1c253d',
             }}
           >
@@ -200,9 +153,48 @@ const SidebarAndHeaderLayout = ({ children }) => {
             />
           </Box>
 
+          {/* Role Switching Control */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600 }}>
+              View as:
+            </Typography>
+            <ToggleButtonGroup
+              value={user.role}
+              exclusive
+              onChange={handleRoleChange}
+              size="small"
+              sx={{
+                bgcolor: '#0e1424',
+                border: '1px solid #1c253d',
+                borderRadius: '12px',
+                '& .MuiToggleButton-root': {
+                  color: '#94a3b8',
+                  border: 'none',
+                  px: 2.5,
+                  py: 0.6,
+                  textTransform: 'none',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  borderRadius: '10px',
+                  transition: 'all 0.2s ease',
+                  '&.Mui-selected': {
+                    bgcolor: user.role === 'admin' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                    color: user.role === 'admin' ? '#10b981' : '#3b82f6',
+                    '&:hover': {
+                      bgcolor: user.role === 'admin' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(59, 130, 246, 0.2)',
+                    }
+                  }
+                }
+              }}
+            >
+              <ToggleButton value="admin">Admin</ToggleButton>
+              <ToggleButton value="employee">Employee</ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+
           {/* Right Side Tools */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 3.5 }}>
-            <IconButton sx={{ p: 0.5, color: '#94a3b8' }}>
+            <IconButton sx={{ color: '#94a3b8', p: 0.5 }}>
               <Badge color="error" variant="dot">
                 <NotificationsNoneIcon />
               </Badge>
@@ -243,6 +235,13 @@ const SidebarAndHeaderLayout = ({ children }) => {
   );
 };
 
+// Route redirect based on active user role
+const RootRedirect = () => {
+  const { user } = useAuth();
+  const redirectPath = user.role === 'admin' ? '/admin/dashboard' : '/employee/board';
+  return <Navigate to={redirectPath} replace />;
+};
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
@@ -251,9 +250,6 @@ function App() {
         <Router>
           <SidebarAndHeaderLayout>
             <Routes>
-              {/* Public Route */}
-              <Route path="/login" element={<Login />} />
-
               {/* Admin View */}
               <Route
                 path="/admin/dashboard"
@@ -275,8 +271,8 @@ function App() {
               />
 
               {/* Default Fallbacks */}
-              <Route path="/" element={<Navigate to="/login" replace />} />
-              <Route path="*" element={<Navigate to="/login" replace />} />
+              <Route path="/" element={<RootRedirect />} />
+              <Route path="*" element={<RootRedirect />} />
             </Routes>
           </SidebarAndHeaderLayout>
         </Router>
