@@ -4,7 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import CloseIcon from '@mui/icons-material/Close';
-import { getEmployees, getTasks, createTask } from '../services/apiService';
+import { getEmployees, getTasks, createTask, updateTask } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import TaskCard from '../components/TaskCard';
 
@@ -18,6 +18,12 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
   const [open, setOpen] = useState(false);
+  const [dueDate, setDueDate] = useState('');
+  const [editingTask, setEditingTask] = useState(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editAssignedUserIds, setEditAssignedUserIds] = useState([]);
+  const [editDueDate, setEditDueDate] = useState('');
 
   // Filter & Sort States
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
@@ -60,10 +66,12 @@ const AdminDashboard = () => {
       await createTask({
         title,
         description,
+        due_date: dueDate || null,
         user_ids: assignedUserIds,
       });
       setTitle('');
       setDescription('');
+      setDueDate('');
       setAssignedUserIds([]);
       setOpen(false);
       setPage(1);
@@ -76,8 +84,35 @@ const AdminDashboard = () => {
   const handleCancel = () => {
     setTitle('');
     setDescription('');
+    setDueDate('');
     setAssignedUserIds([]);
     setOpen(false);
+  };
+
+  const handleEditClick = (task) => {
+    setEditingTask(task);
+    setEditTitle(task.title);
+    setEditDescription(task.description || '');
+    setEditDueDate(task.due_date || '');
+    setEditAssignedUserIds(task.users ? task.users.map((u) => u.id) : []);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editTitle.trim() || editAssignedUserIds.length === 0) return;
+
+    try {
+      await updateTask(editingTask.id, {
+        title: editTitle,
+        description: editDescription,
+        due_date: editDueDate || null,
+        user_ids: editAssignedUserIds,
+      });
+      setEditingTask(null);
+      setRefreshKey((prev) => prev + 1);
+    } catch (err) {
+      console.error('Failed to update task details', err);
+    }
   };
 
   const handleFilterClick = (event) => {
@@ -219,7 +254,7 @@ const AdminDashboard = () => {
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {paginatedTasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard key={task.id} task={task} onEditClick={handleEditClick} />
             ))}
 
             {/* Pagination Controls */}
@@ -265,21 +300,21 @@ const AdminDashboard = () => {
         onClose={handleFilterClose}
         PaperProps={{
           sx: {
-            width: '260px',
+            width: '280px',
             background: '#0e1424',
             border: '1px solid #1c253d',
             color: '#f8fafc',
-            p: 2,
+            p: 3, // generous padding
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
           }
         }}
       >
-        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5, pb: 0.5, borderBottom: '1px solid #1c253d', color: '#f8fafc' }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', mb: 2, pb: 0.5, borderBottom: '1px solid #1c253d', color: '#f8fafc' }}>
           Sort & Filters
         </Typography>
 
         {/* Sort Group */}
-        <Typography variant="caption" sx={{ color: '#475569', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
+        <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
           Sort by
         </Typography>
         <RadioGroup 
@@ -294,24 +329,24 @@ const AdminDashboard = () => {
             value="newest" 
             control={<Radio size="small" sx={{ color: '#1c253d', '&.Mui-checked': { color: '#10b981' } }} />} 
             label="Newest First" 
-            componentsProps={{ typography: { fontSize: '0.8rem', color: '#94a3b8' } }}
+            componentsProps={{ typography: { fontSize: '0.8rem', color: '#cbd5e1' } }}
           />
           <FormControlLabel 
             value="oldest" 
             control={<Radio size="small" sx={{ color: '#1c253d', '&.Mui-checked': { color: '#10b981' } }} />} 
             label="Oldest First" 
-            componentsProps={{ typography: { fontSize: '0.8rem', color: '#94a3b8' } }}
+            componentsProps={{ typography: { fontSize: '0.8rem', color: '#cbd5e1' } }}
           />
           <FormControlLabel 
             value="alphabetical" 
             control={<Radio size="small" sx={{ color: '#1c253d', '&.Mui-checked': { color: '#10b981' } }} />} 
             label="Alphabetical (A-Z)" 
-            componentsProps={{ typography: { fontSize: '0.8rem', color: '#94a3b8' } }}
+            componentsProps={{ typography: { fontSize: '0.8rem', color: '#cbd5e1' } }}
           />
         </RadioGroup>
 
         {/* Status Filter Group */}
-        <Typography variant="caption" sx={{ color: '#475569', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
+        <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
           Filter Status
         </Typography>
         <FormControl fullWidth size="small" sx={{ mb: 3 }}>
@@ -322,7 +357,7 @@ const AdminDashboard = () => {
               setPage(1);
             }}
             sx={{
-              background: '#090d16',
+              background: '#0b0f19', // High contrast background
               fontSize: '0.8rem',
               color: '#f8fafc',
               '& fieldset': { borderColor: '#1c253d' },
@@ -337,7 +372,7 @@ const AdminDashboard = () => {
         </FormControl>
 
         {/* Assignee Filter Group */}
-        <Typography variant="caption" sx={{ color: '#475569', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
+        <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
           Filter Assignee
         </Typography>
         <FormControl fullWidth size="small" sx={{ mb: 1 }}>
@@ -348,7 +383,7 @@ const AdminDashboard = () => {
               setPage(1);
             }}
             sx={{
-              background: '#090d16',
+              background: '#0b0f19', // High contrast background
               fontSize: '0.8rem',
               color: '#f8fafc',
               '& fieldset': { borderColor: '#1c253d' },
@@ -456,6 +491,28 @@ const AdminDashboard = () => {
             />
 
             <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              Due Date
+            </Typography>
+            <TextField
+              fullWidth
+              type="date"
+              variant="outlined"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  background: '#0b0f19',
+                  borderRadius: '10px',
+                  '& fieldset': { borderColor: '#1c253d' },
+                  '&:hover fieldset': { borderColor: '#2e3b5e' },
+                  '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                },
+                '& input': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' }
+              }}
+            />
+
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
               Assign Employees
             </Typography>
             <FormControl fullWidth sx={{ mb: 4.5 }}>
@@ -545,6 +602,213 @@ const AdminDashboard = () => {
                 }}
               >
                 Create Task
+              </Button>
+            </Box>
+          </form>
+        </Box>
+      </Dialog>
+
+      {/* EDIT TASK MODAL (Popup Dialog with UI/UX Pro Max guidelines) */}
+      <Dialog
+        open={Boolean(editingTask)}
+        onClose={() => setEditingTask(null)}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: 'rgba(3, 7, 18, 0.65)',
+              backdropFilter: 'blur(8px)',
+            }
+          }
+        }}
+        PaperProps={{
+          sx: {
+            background: '#0e1424',
+            border: '1px solid #1c253d',
+            borderRadius: '16px',
+            width: '460px',
+            maxWidth: '90%',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
+          }
+        }}
+      >
+        {/* Inner Wrapper Box to enforce padding boundaries */}
+        <Box sx={{ p: 4 }}>
+          {/* Header Title Section */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc', letterSpacing: '-0.02em', fontSize: '1.25rem', lineHeight: 1.2 }}>
+                Edit Task
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600, display: 'block', mt: 0.5, fontSize: '0.75rem' }}>
+                Modify task attributes and deadline
+              </Typography>
+            </Box>
+            <IconButton onClick={() => setEditingTask(null)} sx={{ color: '#cbd5e1', p: 0.5, '&:hover': { color: '#f8fafc', bgcolor: 'rgba(255,255,255,0.05)' } }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
+
+          <form onSubmit={handleEditSubmit}>
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              Title
+            </Typography>
+            <TextField
+              fullWidth
+              placeholder="Task title..."
+              variant="outlined"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  background: '#0b0f19',
+                  borderRadius: '10px',
+                  '& fieldset': { borderColor: '#1c253d' },
+                  '&:hover fieldset': { borderColor: '#2e3b5e' },
+                  '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                },
+                '& input': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' },
+                '& input::placeholder': { color: '#64748b', opacity: 1 }
+              }}
+              required
+            />
+
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              Description
+            </Typography>
+            <TextField
+              fullWidth
+              placeholder="Task description details..."
+              variant="outlined"
+              multiline
+              rows={4}
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  background: '#0b0f19',
+                  borderRadius: '10px',
+                  '& fieldset': { borderColor: '#1c253d' },
+                  '&:hover fieldset': { borderColor: '#2e3b5e' },
+                  '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                },
+                '& textarea': { fontSize: '0.85rem', color: '#f8fafc' },
+                '& textarea::placeholder': { color: '#64748b', opacity: 1 }
+              }}
+            />
+
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              Due Date
+            </Typography>
+            <TextField
+              fullWidth
+              type="date"
+              variant="outlined"
+              value={editDueDate}
+              onChange={(e) => setEditDueDate(e.target.value)}
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  background: '#0b0f19',
+                  borderRadius: '10px',
+                  '& fieldset': { borderColor: '#1c253d' },
+                  '&:hover fieldset': { borderColor: '#2e3b5e' },
+                  '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                },
+                '& input': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' }
+              }}
+            />
+
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              Assign Employees
+            </Typography>
+            <FormControl fullWidth sx={{ mb: 4.5 }}>
+              <Select
+                multiple
+                displayEmpty
+                value={editAssignedUserIds}
+                onChange={(e) => setEditAssignedUserIds(e.target.value)}
+                input={
+                  <OutlinedInput
+                    sx={{
+                      background: '#0b0f19',
+                      borderRadius: '10px',
+                      '& fieldset': { borderColor: '#1c253d' },
+                      '&:hover fieldset': { borderColor: '#2e3b5e' },
+                      '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                      '& .MuiSelect-select': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' }
+                    }}
+                  />
+                }
+                renderValue={(selected) => {
+                  if (selected.length === 0) {
+                    return <span style={{ color: '#64748b' }}>[Search/Select Employees...]</span>;
+                  }
+                  return (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((id) => {
+                        const emp = employees.find((e) => e.id === id);
+                        return emp ? (
+                          <Chip
+                            key={id}
+                            label={emp.name}
+                            size="small"
+                            sx={{
+                              bgcolor: 'rgba(16, 185, 129, 0.1)',
+                              color: '#10b981',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              height: '22px'
+                            }}
+                          />
+                        ) : null;
+                      })}
+                    </Box>
+                  );
+                }}
+              >
+                {employees.map((employee) => (
+                  <MenuItem key={employee.id} value={employee.id} sx={{ py: 0.5 }}>
+                    <Checkbox checked={editAssignedUserIds.indexOf(employee.id) > -1} size="small" />
+                    <ListItemText primary={employee.name} primaryTypographyProps={{ fontSize: '0.85rem' }} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => setEditingTask(null)}
+                sx={{
+                  height: '44px',
+                  color: '#94a3b8',
+                  borderColor: '#1c253d',
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  '&:hover': { borderColor: '#2e3b5e', background: 'rgba(255, 255, 255, 0.02)' }
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                type="submit"
+                sx={{
+                  height: '44px',
+                  bgcolor: '#10b981',
+                  color: '#090d16',
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  '&:hover': { bgcolor: '#059669' }
+                }}
+              >
+                Save Changes
               </Button>
             </Box>
           </form>
