@@ -15,18 +15,13 @@ import { getEmployees } from './services/apiService';
 const DRAWER_WIDTH = 240;
 
 const SidebarAndHeaderLayout = ({ children }) => {
-  const { user, switchRole, switchUser, searchQuery, setSearchQuery } = useAuth();
+  const { user, logout, switchUser, searchQuery, setSearchQuery, notifications, markAllNotificationsAsRead } = useAuth();
+  const { switchRole } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [switchableUsers, setSwitchableUsers] = useState([]);
 
-  // Live simulation notifications
-  const [notifications, setNotifications] = useState([
-    { id: 1, title: 'Task Created', message: 'Alice Admin created task: Redesign logo', time: 'Just now', read: false },
-    { id: 2, title: 'Task Started', message: 'Bob Employee started task: update backend', time: '10 mins ago', read: false },
-    { id: 3, title: 'Task Completed', message: 'Charlie Employee completed task: Update UI Components', time: '1 hr ago', read: true },
-  ]);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
 
   useEffect(() => {
@@ -62,10 +57,6 @@ const SidebarAndHeaderLayout = ({ children }) => {
 
   const handleNotifClick = (event) => {
     setNotificationAnchorEl(event.currentTarget);
-  };
-
-  const markAllNotificationsAsRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, read: true })));
   };
 
   const unreadCount = notifications.filter((n) => !n.read).length;
