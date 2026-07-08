@@ -139,7 +139,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <Box sx={{ py: 1, maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+    <Box sx={{ py: 1, width: '100%' }}>
       {/* Title Header with Action Button & Date */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
         <Box>
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'start', gap: 1, color: '#94a3b8' }}>
+          <Box sx={{ display: 'flex', alignItems: 'i', gap: 1, color: '#94a3b8' }}>
             <CalendarMonthIcon fontSize="small" />
             <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
               {formattedDate}
