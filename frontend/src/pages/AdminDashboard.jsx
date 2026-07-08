@@ -382,169 +382,171 @@ const AdminDashboard = () => {
             background: '#0e1424',
             border: '1px solid #1c253d',
             borderRadius: '16px',
-            p: 4, // 8dp rhythm padding
             width: '460px',
             maxWidth: '90%',
             boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
           }
         }}
       >
-        {/* Header Title Section */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc', letterSpacing: '-0.02em', fontSize: '1.25rem', lineHeight: 1.2 }}>
-              Create Task
-            </Typography>
-            <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mt: 0.5, fontSize: '0.75rem' }}>
-              Assign a new task to team members
-            </Typography>
+        {/* Inner Wrapper Box to enforce padding boundaries */}
+        <Box sx={{ p: 4 }}>
+          {/* Header Title Section */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc', letterSpacing: '-0.02em', fontSize: '1.25rem', lineHeight: 1.2 }}>
+                Create Task
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mt: 0.5, fontSize: '0.75rem' }}>
+                Assign a new task to team members
+              </Typography>
+            </Box>
+            <IconButton onClick={handleCancel} sx={{ color: '#475569', p: 0.5, '&:hover': { color: '#f8fafc', bgcolor: 'rgba(255,255,255,0.03)' } }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
           </Box>
-          <IconButton onClick={handleCancel} sx={{ color: '#475569', p: 0.5, '&:hover': { color: '#f8fafc', bgcolor: 'rgba(255,255,255,0.03)' } }}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </Box>
 
-        <form onSubmit={handleSubmit}>
-          <Typography variant="caption" sx={{ color: '#94a3b8', display: 'block', mb: 1, fontWeight: 600 }}>
-            Title
-          </Typography>
-          <TextField
-            fullWidth
-            placeholder="Task title..."
-            variant="outlined"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            sx={{
-              mb: 3,
-              '& .MuiOutlinedInput-root': {
-                background: '#090d16',
-                borderRadius: '10px',
-                '& fieldset': { borderColor: '#1c253d' },
-                '&:hover fieldset': { borderColor: '#2e3b5e' },
-                '&.Mui-focused fieldset': { borderColor: '#10b981' }, // focus feedback
-              },
-              '& input': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' }
-            }}
-            required
-          />
-
-          <Typography variant="caption" sx={{ color: '#94a3b8', display: 'block', mb: 1, fontWeight: 600 }}>
-            Description
-          </Typography>
-          <TextField
-            fullWidth
-            placeholder="Task description details..."
-            variant="outlined"
-            multiline
-            rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            sx={{
-              mb: 3,
-              '& .MuiOutlinedInput-root': {
-                background: '#090d16',
-                borderRadius: '10px',
-                '& fieldset': { borderColor: '#1c253d' },
-                '&:hover fieldset': { borderColor: '#2e3b5e' },
-                '&.Mui-focused fieldset': { borderColor: '#10b981' }, // focus feedback
-              },
-              '& textarea': { fontSize: '0.85rem', color: '#f8fafc' }
-            }}
-          />
-
-          <Typography variant="caption" sx={{ color: '#94a3b8', display: 'block', mb: 1, fontWeight: 600 }}>
-            Assign Employees
-          </Typography>
-          <FormControl fullWidth sx={{ mb: 4.5 }}>
-            <Select
-              multiple
-              displayEmpty
-              value={assignedUserIds}
-              onChange={(e) => setAssignedUserIds(e.target.value)}
-              input={
-                <OutlinedInput
-                  sx={{
-                    background: '#090d16',
-                    borderRadius: '10px',
-                    '& fieldset': { borderColor: '#1c253d' },
-                    '&:hover fieldset': { borderColor: '#2e3b5e' },
-                    '&.Mui-focused fieldset': { borderColor: '#10b981' }, // focus feedback
-                    '& .MuiSelect-select': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' }
-                  }}
-                />
-              }
-              renderValue={(selected) => {
-                if (selected.length === 0) {
-                  return <span style={{ color: '#475569' }}>[Search/Select Employees...]</span>;
-                }
-                return (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map((id) => {
-                      const emp = employees.find((e) => e.id === id);
-                      return emp ? (
-                        <Chip
-                          key={id}
-                          label={emp.name}
-                          size="small"
-                          sx={{
-                            bgcolor: 'rgba(16, 185, 129, 0.1)',
-                            color: '#10b981',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            height: '22px'
-                          }}
-                        />
-                      ) : null;
-                    })}
-                  </Box>
-                );
-              }}
-            >
-              {employees.map((employee) => (
-                <MenuItem key={employee.id} value={employee.id} sx={{ py: 0.5 }}>
-                  <Checkbox checked={assignedUserIds.indexOf(employee.id) > -1} size="small" />
-                  <ListItemText primary={employee.name} primaryTypographyProps={{ fontSize: '0.85rem' }} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Bottom Actions */}
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button
+          <form onSubmit={handleSubmit}>
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              Title
+            </Typography>
+            <TextField
               fullWidth
+              placeholder="Task title..."
               variant="outlined"
-              onClick={handleCancel}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               sx={{
-                height: '44px', // 44pt touch target size standard
-                color: '#94a3b8',
-                borderColor: '#1c253d',
-                textTransform: 'none',
-                fontWeight: 'bold',
-                borderRadius: '10px',
-                '&:hover': { borderColor: '#2e3b5e', background: 'rgba(255, 255, 255, 0.02)' }
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  background: '#0b0f19', // High contrast input background
+                  borderRadius: '10px',
+                  '& fieldset': { borderColor: '#1c253d' },
+                  '&:hover fieldset': { borderColor: '#2e3b5e' },
+                  '&.Mui-focused fieldset': { borderColor: '#10b981' }, // focus feedback
+                },
+                '& input': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' }
               }}
-            >
-              Cancel
-            </Button>
-            <Button
+              required
+            />
+
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              Description
+            </Typography>
+            <TextField
               fullWidth
-              variant="contained"
-              type="submit"
+              placeholder="Task description details..."
+              variant="outlined"
+              multiline
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               sx={{
-                height: '44px', // 44pt touch target size standard
-                bgcolor: '#10b981',
-                color: '#090d16',
-                textTransform: 'none',
-                fontWeight: 'bold',
-                borderRadius: '10px',
-                '&:hover': { bgcolor: '#059669' }
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  background: '#0b0f19', // High contrast input background
+                  borderRadius: '10px',
+                  '& fieldset': { borderColor: '#1c253d' },
+                  '&:hover fieldset': { borderColor: '#2e3b5e' },
+                  '&.Mui-focused fieldset': { borderColor: '#10b981' }, // focus feedback
+                },
+                '& textarea': { fontSize: '0.85rem', color: '#f8fafc' }
               }}
-            >
-              Create Task
-            </Button>
-          </Box>
-        </form>
+            />
+
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              Assign Employees
+            </Typography>
+            <FormControl fullWidth sx={{ mb: 4.5 }}>
+              <Select
+                multiple
+                displayEmpty
+                value={assignedUserIds}
+                onChange={(e) => setAssignedUserIds(e.target.value)}
+                input={
+                  <OutlinedInput
+                    sx={{
+                      background: '#0b0f19', // High contrast input background
+                      borderRadius: '10px',
+                      '& fieldset': { borderColor: '#1c253d' },
+                      '&:hover fieldset': { borderColor: '#2e3b5e' },
+                      '&.Mui-focused fieldset': { borderColor: '#10b981' }, // focus feedback
+                      '& .MuiSelect-select': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' }
+                    }}
+                  />
+                }
+                renderValue={(selected) => {
+                  if (selected.length === 0) {
+                    return <span style={{ color: '#475569' }}>[Search/Select Employees...]</span>;
+                  }
+                  return (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((id) => {
+                        const emp = employees.find((e) => e.id === id);
+                        return emp ? (
+                          <Chip
+                            key={id}
+                            label={emp.name}
+                            size="small"
+                            sx={{
+                              bgcolor: 'rgba(16, 185, 129, 0.1)',
+                              color: '#10b981',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              height: '22px'
+                            }}
+                          />
+                        ) : null;
+                      })}
+                    </Box>
+                  );
+                }}
+              >
+                {employees.map((employee) => (
+                  <MenuItem key={employee.id} value={employee.id} sx={{ py: 0.5 }}>
+                    <Checkbox checked={assignedUserIds.indexOf(employee.id) > -1} size="small" />
+                    <ListItemText primary={employee.name} primaryTypographyProps={{ fontSize: '0.85rem' }} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {/* Bottom Actions */}
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleCancel}
+                sx={{
+                  height: '44px', // 44pt touch target size standard
+                  color: '#94a3b8',
+                  borderColor: '#1c253d',
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  '&:hover': { borderColor: '#2e3b5e', background: 'rgba(255, 255, 255, 0.02)' }
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                type="submit"
+                sx={{
+                  height: '44px', // 44pt touch target size standard
+                  bgcolor: '#10b981',
+                  color: '#090d16',
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  '&:hover': { bgcolor: '#059669' }
+                }}
+              >
+                Create Task
+              </Button>
+            </Box>
+          </form>
+        </Box>
       </Dialog>
     </Box>
   );
