@@ -27,7 +27,7 @@ The redesign will modify:
 *   Modify: `frontend/src/App.jsx`
 *   Delete: `frontend/src/components/Navbar.jsx` (will be replaced by sidebar/header)
 
-- [ ] **Step 1: Rebuild App.jsx layout shell**
+- [x] **Step 1: Rebuild App.jsx layout shell**
 
 Update `frontend/src/App.jsx` to introduce the left sidebar drawer and top header bar.
 Configure navigation highlights and user state integration.
@@ -322,7 +322,7 @@ function App() {
 export default App;
 ```
 
-- [ ] **Step 2: Remove old Navbar.jsx**
+- [x] **Step 2: Remove old Navbar.jsx**
 
 Remove the now-unused file `frontend/src/components/Navbar.jsx`.
 
@@ -333,7 +333,7 @@ Remove the now-unused file `frontend/src/components/Navbar.jsx`.
 **Files:**
 *   Modify: `frontend/src/components/TaskCard.jsx`
 
-- [ ] **Step 1: Re-implement TaskCard based on screenshot styling**
+- [x] **Step 1: Re-implement TaskCard based on screenshot styling**
 
 Modify `frontend/src/components/TaskCard.jsx` to render:
 - Rounded status badge on right (In Progress, Completed, Pending).
@@ -452,7 +452,7 @@ export default TaskCard;
 **Files:**
 *   Modify: `frontend/src/pages/AdminDashboard.jsx`
 
-- [ ] **Step 1: Re-implement AdminDashboard.jsx**
+- [x] **Step 1: Re-implement AdminDashboard.jsx**
 
 Update `frontend/src/pages/AdminDashboard.jsx` to render the Task Management Dashboard with date display, create card, and tasks feed aligning with the screenshot design.
 ```jsx
