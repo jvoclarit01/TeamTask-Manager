@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import EmployeeBoard from './pages/EmployeeBoard';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
         <Router>
           <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Navbar />
-            <Container maxWidth="lg" sx={{ flexGrow: 1, px: { xs: 2, sm: 3 } }}>
+            <Container maxWidth="lg" sx={{ flexGrow: 1, px: { xs: 2, sm: 3 }, pb: 4 }}>
               <Routes>
                 {/* Public Route */}
                 <Route path="/login" element={<Login />} />
@@ -46,6 +47,7 @@ function App() {
                 <Route path="*" element={<Navigate to="/login" replace />} />
               </Routes>
             </Container>
+            <Footer />
           </Box>
         </Router>
       </AuthProvider>
