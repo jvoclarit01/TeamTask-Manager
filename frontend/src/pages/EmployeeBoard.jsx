@@ -71,7 +71,7 @@ const EmployeeBoard = () => {
         My Work Board
       </Typography>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
         {['pending', 'in_progress', 'completed'].map((status) => {
           const title =
             status === 'pending'
@@ -89,13 +89,18 @@ const EmployeeBoard = () => {
                   p: 2.5,
                   background: 'rgba(15, 23, 42, 0.45)',
                   border: '1px solid #1e293b',
-                  minHeight: isExpanded ? '65vh' : 'auto',
+                  minHeight: isExpanded ? '400px' : 'auto',
+                  maxHeight: isExpanded ? '600px' : 'auto',
+                  maxWidth: '380px',
+                  margin: '0 auto',
                   borderRadius: '16px',
                   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-                  transition: 'min-height 0.3s ease',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: isExpanded ? 3 : 0 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: isExpanded ? 3 : 0, flexShrink: 0 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     {columnTasks.length === 0 && (
                       <IconButton
@@ -141,21 +146,32 @@ const EmployeeBoard = () => {
                       height: '180px', 
                       border: '1px dashed rgba(255,255,255,0.03)', 
                       borderRadius: '12px',
-                      background: 'rgba(255,255,255,0.01)'
+                      background: 'rgba(255,255,255,0.01)',
+                      flexShrink: 0,
                     }}>
                       <Typography variant="body2" sx={{ color: '#334155', fontWeight: 500 }}>
                         No tasks assigned
                       </Typography>
                     </Box>
                   ) : (
-                    columnTasks.map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        isEmployeeView={true}
-                        onStatusChange={handleStatusChange}
-                      />
-                    ))
+                    <Box 
+                      sx={{ 
+                        overflowY: 'auto', 
+                        flexGrow: 1, 
+                        pr: 0.5,
+                        '&::-webkit-scrollbar': { width: '6px' }, 
+                        '&::-webkit-scrollbar-thumb': { background: '#1e293b', borderRadius: '3px' } 
+                      }}
+                    >
+                      {columnTasks.map((task) => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          isEmployeeView={true}
+                          onStatusChange={handleStatusChange}
+                        />
+                      ))}
+                    </Box>
                   )
                 )}
               </Paper>
