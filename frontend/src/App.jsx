@@ -15,7 +15,7 @@ import { getEmployees } from './services/apiService';
 const DRAWER_WIDTH = 240;
 
 const SidebarAndHeaderLayout = ({ children }) => {
-  const { user, logout, switchUser, searchQuery, setSearchQuery, notifications, markAllNotificationsAsRead } = useAuth();
+  const { user, switchUser, searchQuery, setSearchQuery, notifications, markAllNotificationsAsRead } = useAuth();
   const { switchRole } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
