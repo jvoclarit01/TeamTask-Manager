@@ -1,18 +1,21 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext } from 'react';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('user_session');
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      try {
+        return JSON.parse(savedUser);
+      } catch (error) {
+        console.error('Error parsing user session from localStorage:', error);
+        localStorage.removeItem('user_session');
+      }
     }
-    setLoading(false);
-  }, []);
+    return null;
+  });
+  const [loading] = useState(false);
 
   const login = (userData) => {
     setUser(userData);
@@ -31,4 +34,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

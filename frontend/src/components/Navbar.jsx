@@ -1,4 +1,3 @@
-import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Chip, Avatar } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';

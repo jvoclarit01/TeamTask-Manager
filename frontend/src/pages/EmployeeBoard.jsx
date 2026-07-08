@@ -8,27 +8,35 @@ const EmployeeBoard = () => {
   const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const loadMyTasks = async () => {
-    if (!user?.id) return;
-    try {
-      const res = await getMyTasks(user.id);
-      setTasks(res.data);
-    } catch (err) {
-      console.error('Failed to load employee tasks', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
+    let active = true;
+    const loadMyTasks = async () => {
+      if (!user?.id) return;
+      try {
+        const res = await getMyTasks(user.id);
+        if (active) {
+          setTasks(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to load employee tasks', err);
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
     loadMyTasks();
-  }, [user]);
+    return () => {
+      active = false;
+    };
+  }, [user, refreshKey]);
 
   const handleStatusChange = async (taskId, newStatus) => {
     try {
       await updateTaskStatus(taskId, newStatus);
-      loadMyTasks();
+      setRefreshKey((prev) => prev + 1);
     } catch (err) {
       console.error('Failed to transition task status', err);
     }
