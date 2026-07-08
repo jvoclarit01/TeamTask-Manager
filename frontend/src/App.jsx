@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
-import { ThemeProvider, CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, InputBase, Badge, Container, IconButton, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import { ThemeProvider, CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, InputBase, Badge, Container, IconButton, ToggleButtonGroup, ToggleButton, Menu, MenuItem } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
@@ -9,15 +10,58 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/AdminDashboard';
 import EmployeeBoard from './pages/EmployeeBoard';
 import Footer from './components/Footer';
+import { getEmployees } from './services/apiService';
 
 const DRAWER_WIDTH = 240;
 
 const SidebarAndHeaderLayout = ({ children }) => {
-  const { user, switchRole } = useAuth();
+  const { user, switchRole, switchUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [switchableUsers, setSwitchableUsers] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    const loadUsers = async () => {
+      try {
+        const res = await getEmployees();
+        if (active) {
+          const adminUser = { id: 999, name: 'Alice Admin', email: 'admin@company.com', role: 'admin' };
+          setSwitchableUsers([adminUser, ...res.data]);
+        }
+      } catch (err) {
+        console.error('Failed to load switchable users', err);
+      }
+    };
+    if (user) {
+      loadUsers();
+    }
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   if (!user) return <Box sx={{ width: '100%' }}>{children}</Box>;
+
+  const handleProfileClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleUserSwitch = (selectedUser) => {
+    switchUser(selectedUser);
+    handleMenuClose();
+    const isSelAdmin = selectedUser.name.includes('Admin') || selectedUser.role === 'admin';
+    if (isSelAdmin) {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/employee/board');
+    }
+  };
 
   const handleRoleChange = (event, newRole) => {
     if (!newRole) return;
@@ -200,8 +244,20 @@ const SidebarAndHeaderLayout = ({ children }) => {
               </Badge>
             </IconButton>
 
-            {/* User Profile Info */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            {/* User Profile Info (Clickable for switch profile dropdown) */}
+            <Box 
+              onClick={handleProfileClick}
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1.5, 
+                cursor: 'pointer',
+                p: 0.8,
+                borderRadius: '8px',
+                transition: 'all 0.2s ease',
+                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' }
+              }}
+            >
               <Box sx={{ textAlign: 'right' }}>
                 <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#f8fafc', fontSize: '0.85rem' }}>
                   {user.name}
@@ -222,6 +278,53 @@ const SidebarAndHeaderLayout = ({ children }) => {
                 {user.name.charAt(0)}
               </Avatar>
             </Box>
+
+            {/* Profile Dropdown Menu */}
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              PaperProps={{
+                sx: {
+                  background: '#0e1424',
+                  border: '1px solid #1c253d',
+                  color: '#f8fafc',
+                  mt: 1,
+                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+                  '& .MuiMenuItem-root': {
+                    fontSize: '0.85rem',
+                    py: 1,
+                    px: 2.5,
+                    '&:hover': {
+                      background: 'rgba(255, 255, 255, 0.03)',
+                    },
+                    '&.Mui-selected': {
+                      background: user.role === 'admin' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                      color: user.role === 'admin' ? '#10b981' : '#3b82f6',
+                      fontWeight: 'bold',
+                    }
+                  }
+                }
+              }}
+            >
+              <Box sx={{ px: 2.5, py: 1, borderBottom: '1px solid #1c253d', mb: 0.5 }}>
+                <Typography variant="caption" sx={{ color: '#475569', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Switch User
+                </Typography>
+              </Box>
+              {switchableUsers.map((u) => {
+                const isUserAdmin = u.name.includes('Admin') || u.role === 'admin';
+                return (
+                  <MenuItem 
+                    key={u.id} 
+                    onClick={() => handleUserSwitch(u)}
+                    selected={u.id === user.id}
+                  >
+                    {u.name} ({isUserAdmin ? 'Admin' : 'Employee'})
+                  </MenuItem>
+                );
+              })}
+            </Menu>
           </Box>
         </Box>
 

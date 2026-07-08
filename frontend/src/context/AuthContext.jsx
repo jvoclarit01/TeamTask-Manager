@@ -34,8 +34,20 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user_session', JSON.stringify(newUser));
   };
 
+  const switchUser = (userObj) => {
+    const isSelAdmin = userObj.name.includes('Admin') || userObj.role === 'admin';
+    const sessionUser = {
+      id: userObj.id,
+      name: userObj.name,
+      email: userObj.email,
+      role: isSelAdmin ? 'admin' : 'employee',
+    };
+    setUser(sessionUser);
+    localStorage.setItem('user_session', JSON.stringify(sessionUser));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, switchRole }}>
+    <AuthContext.Provider value={{ user, login, logout, switchRole, switchUser }}>
       {children}
     </AuthContext.Provider>
   );

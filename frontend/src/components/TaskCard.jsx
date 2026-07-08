@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Box, Chip, Avatar, Tooltip, Button } from '@mui/material';
+import { Card, CardContent, Typography, Box, Chip, Avatar, Tooltip, Button, AvatarGroup } from '@mui/material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 const statusColors = {
@@ -67,37 +67,31 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
         )}
 
         {/* Footer Area */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mt: hasDescription ? 0 : 2 }}>
-          {/* Assigned Avatars List with Names */}
-          <Box>
-            <Box sx={{ display: 'flex', gap: 1.5 }}>
-              {task.users?.map((userObj) => (
-                <Box key={userObj.id} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 48 }}>
-                  <Tooltip title={userObj.name} arrow>
-                    <Avatar 
-                      sx={{ 
-                        width: 28, 
-                        height: 28, 
-                        bgcolor: '#3b82f6', 
-                        fontSize: '0.75rem', 
-                        fontWeight: 'bold',
-                        border: '2px solid #1e293b', // matches card background
-                        mb: 0.5 
-                      }}
-                    >
-                      {userObj.name.charAt(0)}
-                    </Avatar>
-                  </Tooltip>
-                  <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.7rem', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {userObj.name.split(' ')[0]}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: hasDescription ? 0 : 2 }}>
+          {/* Overlapping Avatar Stack (Bottom-Left) */}
+          <AvatarGroup
+            max={3}
+            sx={{
+              '& .MuiAvatar-root': {
+                width: 28,
+                height: 28,
+                fontSize: '0.75rem',
+                border: '2px solid #1e293b', // matches card background
+                bgcolor: '#3b82f6',
+                fontWeight: 'bold',
+                marginLeft: '-6px !important',
+              },
+            }}
+          >
+            {task.users?.map((userObj) => (
+              <Tooltip key={userObj.id} title={userObj.name} arrow>
+                <Avatar>{userObj.name.charAt(0)}</Avatar>
+              </Tooltip>
+            ))}
+          </AvatarGroup>
 
-          {/* Right Side: Action Buttons for Employees or Deadline with calendar icon */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          {/* Right Side: Action Buttons for Employees or Deadline */}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {isEmployeeView && task.status !== 'completed' ? (
               <Box>
                 {task.status === 'pending' && (
@@ -142,16 +136,11 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
                 )}
               </Box>
             ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                <Typography variant="caption" sx={{ color: '#475569', display: 'block', mb: 0.5, fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase' }}>
-                  Deadline
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94a3b8' }}>
+                <CalendarMonthIcon sx={{ fontSize: '0.95rem', color: '#64748b' }} />
+                <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.8rem' }}>
+                  Deadline: {formattedDeadline}
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94a3b8' }}>
-                  <CalendarMonthIcon sx={{ fontSize: '0.9rem', color: '#475569' }} />
-                  <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.8rem' }}>
-                    {formattedDeadline}
-                  </Typography>
-                </Box>
               </Box>
             )}
           </Box>
