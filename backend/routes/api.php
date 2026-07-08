@@ -10,6 +10,7 @@ Route::get('/users',  [UserController::class, 'index']);
 // Create & List all tasks (Admin)
 Route::get('/tasks', [TaskController::class, 'index']);
 Route::post('/tasks', [TaskController::class, 'store']);
+Route::put('/tasks/{id}', [TaskController::class, 'update']);
 
 // Tasks assigned to a specific user (Employee)
 Route::get('/my-tasks/{userId}', [TaskController::class, 'getMyTasks']);
