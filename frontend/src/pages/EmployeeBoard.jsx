@@ -79,7 +79,11 @@ const EmployeeBoard = () => {
                   p: 2.5,
                   background: '#131b2e', // Column background #131B2E
                   border: '1px solid #1c253d',
-                  minHeight: '65vh',
+                  minHeight: '400px',
+                  maxHeight: '600px', // Maximum height constraint
+                  maxWidth: '380px', // Maximum width constraint
+                  width: '100%',
+                  margin: '0 auto',
                   borderRadius: '16px',
                   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
                   display: 'flex',
