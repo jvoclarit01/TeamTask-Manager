@@ -396,11 +396,11 @@ const AdminDashboard = () => {
               <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc', letterSpacing: '-0.02em', fontSize: '1.25rem', lineHeight: 1.2 }}>
                 Create Task
               </Typography>
-              <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, display: 'block', mt: 0.5, fontSize: '0.75rem' }}>
+              <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600, display: 'block', mt: 0.5, fontSize: '0.75rem' }}>
                 Assign a new task to team members
               </Typography>
             </Box>
-            <IconButton onClick={handleCancel} sx={{ color: '#475569', p: 0.5, '&:hover': { color: '#f8fafc', bgcolor: 'rgba(255,255,255,0.03)' } }}>
+            <IconButton onClick={handleCancel} sx={{ color: '#cbd5e1', p: 0.5, '&:hover': { color: '#f8fafc', bgcolor: 'rgba(255,255,255,0.05)' } }}>
               <CloseIcon fontSize="small" />
             </IconButton>
           </Box>
@@ -424,7 +424,8 @@ const AdminDashboard = () => {
                   '&:hover fieldset': { borderColor: '#2e3b5e' },
                   '&.Mui-focused fieldset': { borderColor: '#10b981' }, // focus feedback
                 },
-                '& input': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' }
+                '& input': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' },
+                '& input::placeholder': { color: '#64748b', opacity: 1 }
               }}
               required
             />
@@ -449,7 +450,8 @@ const AdminDashboard = () => {
                   '&:hover fieldset': { borderColor: '#2e3b5e' },
                   '&.Mui-focused fieldset': { borderColor: '#10b981' }, // focus feedback
                 },
-                '& textarea': { fontSize: '0.85rem', color: '#f8fafc' }
+                '& textarea': { fontSize: '0.85rem', color: '#f8fafc' },
+                '& textarea::placeholder': { color: '#64748b', opacity: 1 }
               }}
             />
 
@@ -476,7 +478,7 @@ const AdminDashboard = () => {
                 }
                 renderValue={(selected) => {
                   if (selected.length === 0) {
-                    return <span style={{ color: '#475569' }}>[Search/Select Employees...]</span>;
+                    return <span style={{ color: '#64748b' }}>[Search/Select Employees...]</span>;
                   }
                   return (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
