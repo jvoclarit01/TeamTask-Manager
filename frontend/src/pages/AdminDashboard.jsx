@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button, MenuItem, Select, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, CircularProgress, Chip, Dialog, Menu, Radio, RadioGroup, FormControlLabel } from '@mui/material';
+import { Box, TextField, Button, MenuItem, Select, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, CircularProgress, Chip, Dialog, Menu, Radio, RadioGroup, FormControlLabel, Pagination } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -23,6 +23,10 @@ const AdminDashboard = () => {
   const [sortOrder, setSortOrder] = useState('newest'); // newest, oldest, alphabetical
   const [statusFilter, setStatusFilter] = useState('all'); // all, pending, in_progress, completed
   const [employeeFilter, setEmployeeFilter] = useState('all'); // all, or employee ID
+
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 3; // Setting to 3 to easily demonstrate page switching
 
   useEffect(() => {
     let active = true;
@@ -61,6 +65,7 @@ const AdminDashboard = () => {
       setDescription('');
       setAssignedUserIds([]);
       setOpen(false);
+      setPage(1);
       setRefreshKey((prev) => prev + 1);
     } catch (err) {
       console.error('Failed to assign task', err);
@@ -120,6 +125,11 @@ const AdminDashboard = () => {
     return 0;
   });
 
+  // 5. Paginate tasks (Clamp activePage to ensure it is always within valid page bounds)
+  const pageCount = Math.ceil(filteredTasks.length / itemsPerPage);
+  const activePage = Math.min(page, Math.max(1, pageCount));
+  const paginatedTasks = filteredTasks.slice((activePage - 1) * itemsPerPage, activePage * itemsPerPage);
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
@@ -141,7 +151,7 @@ const AdminDashboard = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#94a3b8' }}>
+          <Box sx={{ display: 'flex', alignItems: 'start', gap: 1, color: '#94a3b8' }}>
             <CalendarMonthIcon fontSize="small" />
             <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
               {formattedDate}
@@ -186,7 +196,7 @@ const AdminDashboard = () => {
           </Box>
         </Box>
 
-        {filteredTasks.length === 0 ? (
+        {paginatedTasks.length === 0 ? (
           <Box sx={{ 
             display: 'flex', 
             flexDirection: 'column', 
@@ -206,9 +216,42 @@ const AdminDashboard = () => {
           </Box>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {filteredTasks.map((task) => (
+            {paginatedTasks.map((task) => (
               <TaskCard key={task.id} task={task} />
             ))}
+
+            {/* Pagination Controls */}
+            {pageCount > 1 && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 1 }}>
+                <Pagination
+                  count={pageCount}
+                  page={activePage}
+                  onChange={(e, val) => setPage(val)}
+                  color="primary"
+                  sx={{
+                    '& .MuiPaginationItem-root': {
+                      color: '#94a3b8',
+                      fontFamily: '"Outfit", sans-serif',
+                      fontWeight: 600,
+                      borderRadius: '8px',
+                      '&:hover': {
+                        bgcolor: 'rgba(16, 185, 129, 0.1)',
+                        color: '#10b981',
+                      },
+                      '&.Mui-selected': {
+                        bgcolor: 'rgba(16, 185, 129, 0.15)',
+                        color: '#10b981',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        fontWeight: 'bold',
+                        '&:hover': {
+                          bgcolor: 'rgba(16, 185, 129, 0.25)',
+                        }
+                      }
+                    }
+                  }}
+                />
+              </Box>
+            )}
           </Box>
         )}
       </Box>
@@ -237,7 +280,14 @@ const AdminDashboard = () => {
         <Typography variant="caption" sx={{ color: '#475569', fontWeight: 'bold', display: 'block', mb: 1, textTransform: 'uppercase' }}>
           Sort by
         </Typography>
-        <RadioGroup value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} sx={{ mb: 3 }}>
+        <RadioGroup 
+          value={sortOrder} 
+          onChange={(e) => {
+            setSortOrder(e.target.value);
+            setPage(1);
+          }} 
+          sx={{ mb: 3 }}
+        >
           <FormControlLabel 
             value="newest" 
             control={<Radio size="small" sx={{ color: '#1c253d', '&.Mui-checked': { color: '#10b981' } }} />} 
@@ -265,7 +315,10 @@ const AdminDashboard = () => {
         <FormControl fullWidth size="small" sx={{ mb: 3 }}>
           <Select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
             sx={{
               background: '#090d16',
               fontSize: '0.8rem',
@@ -288,7 +341,10 @@ const AdminDashboard = () => {
         <FormControl fullWidth size="small" sx={{ mb: 1 }}>
           <Select
             value={employeeFilter}
-            onChange={(e) => setEmployeeFilter(e.target.value)}
+            onChange={(e) => {
+              setEmployeeFilter(e.target.value);
+              setPage(1);
+            }}
             sx={{
               background: '#090d16',
               fontSize: '0.8rem',

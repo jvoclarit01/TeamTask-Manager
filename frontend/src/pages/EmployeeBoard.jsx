@@ -98,7 +98,7 @@ const EmployeeBoard = () => {
                 border: '1px solid #1c253d',
                 minHeight: '600px',
                 maxHeight: '600px', // Maximum height constraint
-                maxWidth: '420px', // Maximum width constraint
+                maxWidth: '500px', // Maximum width constraint
                 width: '100%',
                 borderRadius: '16px',
                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
