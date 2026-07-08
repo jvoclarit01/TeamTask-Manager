@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import TaskCard from '../components/TaskCard';
 
 const EmployeeBoard = () => {
-  const { user, searchQuery } = useAuth();
+  const { user, searchQuery, addNotification } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -34,8 +34,18 @@ const EmployeeBoard = () => {
   }, [user, refreshKey]);
 
   const handleStatusChange = async (taskId, newStatus) => {
+    const taskObj = tasks.find(t => t.id === taskId);
+    const taskTitle = taskObj ? taskObj.title : 'Task';
+    const statusLabels = {
+      pending: 'To Do',
+      in_progress: 'In Progress',
+      completed: 'Completed'
+    };
+    const statusLabel = statusLabels[newStatus] || newStatus;
+
     try {
       await updateTaskStatus(taskId, newStatus);
+      addNotification('Task Progress', `${user.name} moved task "${taskTitle}" to "${statusLabel}"`);
       setRefreshKey((prev) => prev + 1);
     } catch (err) {
       console.error('Failed to transition task status', err);
