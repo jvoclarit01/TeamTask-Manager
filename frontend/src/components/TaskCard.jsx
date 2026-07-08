@@ -1,5 +1,7 @@
-import { Card, CardContent, Typography, Box, Chip, Avatar, Tooltip, Button, AvatarGroup } from '@mui/material';
+import { Card, CardContent, Typography, Box, Chip, Avatar, Tooltip, Button, AvatarGroup, IconButton } from '@mui/material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import EditIcon from '@mui/icons-material/Edit';
+import { useAuth } from '../context/AuthContext';
 
 const statusColors = {
   pending: { label: 'Pending', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
@@ -7,18 +9,17 @@ const statusColors = {
   completed: { label: 'Completed', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
 };
 
-const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
+const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
+  const { user: currentUser } = useAuth();
+  const isAdmin = currentUser?.role === 'admin';
   const currentStatus = statusColors[task.status] || { label: task.status, color: '#cbd5e1', bg: 'rgba(203, 213, 225, 0.1)' };
   const hasDescription = !!task.description && task.description.trim() !== '';
 
-  // Calculate mock deadline based on created date + 7 days
-  const createdDate = task.created_at ? new Date(task.created_at) : new Date();
-  const deadlineDate = new Date(createdDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const formattedDeadline = deadlineDate.toLocaleDateString('en-US', {
+  const formattedDeadline = task.due_date ? new Date(task.due_date).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
-  });
+  }) : 'No deadline';
 
   return (
     <Card 
@@ -42,6 +43,15 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
             <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.05rem', color: '#f8fafc' }}>
               {task.title}
             </Typography>
+            {isAdmin && onEditClick && (
+              <IconButton 
+                size="small" 
+                onClick={() => onEditClick(task)} 
+                sx={{ color: '#cbd5e1', ml: 0.5, p: 0.5, '&:hover': { color: '#10b981', bgcolor: 'rgba(255,255,255,0.05)' } }}
+              >
+                <EditIcon sx={{ fontSize: '1rem' }} />
+              </IconButton>
+            )}
           </Box>
           <Chip
             label={currentStatus.label}
