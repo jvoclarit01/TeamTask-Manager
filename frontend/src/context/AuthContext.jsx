@@ -20,6 +20,29 @@ export const AuthProvider = ({ children }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'Task Created', message: 'Alice Admin created task: Redesign logo', time: 'Just now', read: false },
+    { id: 2, title: 'Task Started', message: 'Bob Employee started task: update backend', time: '10 mins ago', read: false },
+    { id: 3, title: 'Task Completed', message: 'Charlie Employee completed task: Update UI Components', time: '1 hr ago', read: true },
+  ]);
+
+  const addNotification = (title, message) => {
+    setNotifications((prev) => [
+      {
+        id: Date.now(),
+        title,
+        message,
+        time: 'Just now',
+        read: false,
+      },
+      ...prev,
+    ]);
+  };
+
+  const markAllNotificationsAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem('user_session', JSON.stringify(userData));
@@ -49,7 +72,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, switchRole, switchUser, searchQuery, setSearchQuery }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        switchUser,
+        searchQuery,
+        setSearchQuery,
+        notifications,
+        addNotification,
+        markAllNotificationsAsRead,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
