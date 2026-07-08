@@ -30,7 +30,7 @@ The visual redesign will affect:
 *   Modify: `frontend/src/index.css`
 *   Modify: `frontend/src/theme.js`
 
-- [ ] **Step 1: Import Outfit and Fira Code**
+- [x] **Step 1: Import Outfit and Fira Code**
 
 Modify `frontend/src/index.css` to import `Outfit`:
 ```css
@@ -58,7 +58,7 @@ body {
 }
 ```
 
-- [ ] **Step 2: Update theme.js typography**
+- [x] **Step 2: Update theme.js typography**
 
 Modify `frontend/src/theme.js` to use `Outfit` and configure negative letter-spacing for headers:
 ```javascript
@@ -152,7 +152,7 @@ const theme = createTheme({
 export default theme;
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 ```bash
 git add frontend/src/index.css frontend/src/theme.js
 git commit -m "design: upgrade typography to Outfit and implement card edge refraction shadows"
@@ -165,7 +165,7 @@ git commit -m "design: upgrade typography to Outfit and implement card edge refr
 **Files:**
 *   Modify: `frontend/src/components/Navbar.jsx`
 
-- [ ] **Step 1: Refactor Navbar to Floating Glass Dock**
+- [x] **Step 1: Refactor Navbar to Floating Glass Dock**
 
 Modify `frontend/src/components/Navbar.jsx` to make it a floating, padded navbar:
 ```jsx
@@ -256,7 +256,7 @@ const Navbar = () => {
 export default Navbar;
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 ```bash
 git add frontend/src/components/Navbar.jsx
 git commit -m "design: refactor navbar to floating glassmorphic header dock"
@@ -270,7 +270,7 @@ git commit -m "design: refactor navbar to floating glassmorphic header dock"
 *   Modify: `frontend/src/pages/AdminDashboard.jsx`
 *   Modify: `frontend/src/pages/EmployeeBoard.jsx`
 
-- [ ] **Step 1: Upgrade Admin empty state**
+- [x] **Step 1: Upgrade Admin empty state**
 
 Open `frontend/src/pages/AdminDashboard.jsx`. Replace lines 191-197 with a stylized ambient panel for empty tasks list:
 ```jsx
@@ -295,7 +295,7 @@ Open `frontend/src/pages/AdminDashboard.jsx`. Replace lines 191-197 with a styli
           ) : (
 ```
 
-- [ ] **Step 2: Upgrade Employee empty states**
+- [x] **Step 2: Upgrade Employee empty states**
 
 Open `frontend/src/pages/EmployeeBoard.jsx`. Replace lines 107-113 with custom styled empty states:
 ```jsx
@@ -316,7 +316,7 @@ Open `frontend/src/pages/EmployeeBoard.jsx`. Replace lines 107-113 with custom s
                 ) : (
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 ```bash
 git add frontend/src/pages/AdminDashboard.jsx frontend/src/pages/EmployeeBoard.jsx
 git commit -m "design: implement rich dashboard empty states with visual depth"
@@ -330,7 +330,7 @@ git commit -m "design: implement rich dashboard empty states with visual depth"
 *   Create: `frontend/src/components/Footer.jsx`
 *   Modify: `frontend/src/App.jsx`
 
-- [ ] **Step 1: Create Footer component**
+- [x] **Step 1: Create Footer component**
 
 Create `frontend/src/components/Footer.jsx` with standard visual link clusters:
 ```jsx
@@ -371,7 +371,7 @@ const Footer = () => {
 export default Footer;
 ```
 
-- [ ] **Step 2: Inject Footer inside App layout**
+- [x] **Step 2: Inject Footer inside App layout**
 
 Open `frontend/src/App.jsx`. Import `Footer` and place it at the bottom:
 ```jsx
@@ -390,7 +390,7 @@ And replace the return layout with:
           </Box>
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 ```bash
 git add frontend/src/components/Footer.jsx frontend/src/App.jsx
 git commit -m "feat: add global footer component with legals and support links"
