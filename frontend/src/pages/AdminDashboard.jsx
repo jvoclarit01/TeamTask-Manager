@@ -182,9 +182,13 @@ const AdminDashboard = () => {
               </Typography>
             </Box>
           ) : (
-            tasks.map((task) => (
-              <TaskCard key={task.id} task={task} isEmployeeView={false} />
-            ))
+            <Grid container spacing={2}>
+              {tasks.map((task) => (
+                <Grid item xs={12} sm={6} key={task.id}>
+                  <TaskCard task={task} isEmployeeView={false} sx={{ height: '100%' }} />
+                </Grid>
+              ))}
+            </Grid>
           )}
         </Grid>
       </Grid>
