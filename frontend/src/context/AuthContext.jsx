@@ -77,6 +77,7 @@ export const AuthProvider = ({ children }) => {
         user,
         login,
         logout,
+        switchRole,
         switchUser,
         searchQuery,
         setSearchQuery,
