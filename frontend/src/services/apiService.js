@@ -14,5 +14,6 @@ export const getTasks = () => api.get('/tasks');
 export const createTask = (taskData) => api.post('/tasks', taskData);
 export const getMyTasks = (userId) => api.get(`/my-tasks/${userId}`);
 export const updateTaskStatus = (taskId, status) => api.patch(`/tasks/${taskId}/status`, { status });
+export const updateTask = (taskId, data) => api.put(`/tasks/${taskId}`, data);
 
 export default api;
