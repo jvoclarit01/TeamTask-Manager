@@ -4,40 +4,44 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     background: {
-      default: '#020617', // Slate 950 (Deep OLED Black)
-      paper: '#0f172a',   // Slate 900 (Card background)
+      default: '#030712', // Darker black-tinted neutral
+      paper: '#0b1329',   // Deep dark card tone
     },
     primary: {
-      main: '#10b981',    // Emerald Green (Success & Main Action)
+      main: '#10b981',    // Emerald Green
     },
     secondary: {
-      main: '#3b82f6',    // Vivid Blue (Info & Team assignment)
+      main: '#3b82f6',    // Vivid Blue
     },
     warning: {
-      main: '#f59e0b',    // Pending indicator
+      main: '#f59e0b',
     },
     info: {
-      main: '#0ea5e9',       // In Progress indicator
+      main: '#38bdf8',       // Sky Blue (soft)
     },
     text: {
-      primary: '#f8fafc',  // Slate 50
-      secondary: '#94a3b8', // Slate 400
+      primary: '#f8fafc',
+      secondary: '#94a3b8',
     },
-    divider: '#1e293b',    // Slate 800
+    divider: '#1e293b',
   },
   typography: {
-    fontFamily: '"Inter", "Fira Sans", sans-serif',
+    fontFamily: '"Inter", "Outfit", sans-serif',
     h3: {
-      fontFamily: '"Fira Sans", sans-serif',
+      fontFamily: '"Outfit", sans-serif',
       fontWeight: 800,
+      letterSpacing: '-0.03em',
+      lineHeight: 1.1,
     },
     h5: {
-      fontFamily: '"Fira Sans", sans-serif',
+      fontFamily: '"Outfit", sans-serif',
       fontWeight: 700,
+      letterSpacing: '-0.02em',
     },
     h6: {
-      fontFamily: '"Fira Sans", sans-serif',
+      fontFamily: '"Outfit", sans-serif',
       fontWeight: 600,
+      letterSpacing: '-0.01em',
     },
   },
   components: {
@@ -45,15 +49,15 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          backgroundColor: '#0f172a',
-          border: '1px solid #1e293b',
-          borderRadius: '12px',
-          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3)',
-          transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+          backgroundColor: '#070f21',
+          border: '1px solid rgba(255, 255, 255, 0.05)', // Refined border
+          borderRadius: '16px',
+          boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 30px rgba(0, 0, 0, 0.4)', // Inner border glow
+          transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, box-shadow 0.2s ease',
           '&:hover': {
-            transform: 'translateY(-2px)',
-            borderColor: '#334155',
-            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.5), 0 0 12px rgba(16, 185, 129, 0.12)',
+            transform: 'translateY(-3px)',
+            borderColor: 'rgba(16, 185, 129, 0.3)',
+            boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 16px rgba(16, 185, 129, 0.1)',
           },
         },
       },
@@ -61,9 +65,20 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: '8px',
+          borderRadius: '10px',
           textTransform: 'none',
           fontWeight: 600,
+          transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          '&:active': {
+            transform: 'scale(0.97)', // Tap physics click feedback
+          },
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: '10px',
         },
       },
     },
