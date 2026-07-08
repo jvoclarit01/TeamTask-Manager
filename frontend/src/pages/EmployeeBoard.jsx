@@ -105,8 +105,16 @@ const EmployeeBoard = () => {
                 </Box>
 
                 {columnTasks.length === 0 ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '180px' }}>
-                    <Typography variant="body2" sx={{ color: '#475569', fontStyle: 'italic' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    height: '180px', 
+                    border: '1px dashed rgba(255,255,255,0.03)', 
+                    borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.01)'
+                  }}>
+                    <Typography variant="body2" sx={{ color: '#334155', fontWeight: 500 }}>
                       No tasks assigned
                     </Typography>
                   </Box>

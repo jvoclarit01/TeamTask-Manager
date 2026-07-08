@@ -164,7 +164,23 @@ const AdminDashboard = () => {
             Active Team Tasks
           </Typography>
           {tasks.length === 0 ? (
-            <Typography sx={{ color: '#64748b' }}>No tasks assigned yet.</Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              py: 10, 
+              border: '1px dashed #1e293b', 
+              borderRadius: '16px',
+              background: 'rgba(15, 23, 42, 0.2)'
+            }}>
+              <Typography variant="h6" sx={{ color: '#94a3b8', mb: 1, fontWeight: 'bold' }}>
+                All Clear!
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#475569' }}>
+                No tasks created yet. Use the panel on the left to assign one.
+              </Typography>
+            </Box>
           ) : (
             tasks.map((task) => (
               <TaskCard key={task.id} task={task} isEmployeeView={false} />
