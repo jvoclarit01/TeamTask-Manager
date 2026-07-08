@@ -67,10 +67,52 @@ const theme = createTheme({
         root: {
           borderRadius: '10px',
           textTransform: 'none',
-          fontWeight: 600,
+          fontWeight: 700, // Make button labels bold and premium
+          fontFamily: '"Outfit", sans-serif', // Brand typography Pairing
           transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
           '&:active': {
             transform: 'scale(0.97)', // Tap physics click feedback
+          },
+        },
+        containedPrimary: {
+          backgroundColor: '#10b981',
+          color: '#090d16',
+          boxShadow: '0 4px 14px rgba(16, 185, 129, 0.15)',
+          '&:hover': {
+            backgroundColor: '#34d399',
+            boxShadow: '0 6px 20px rgba(16, 185, 129, 0.3), 0 0 12px rgba(16, 185, 129, 0.15)',
+          },
+        },
+        containedSecondary: {
+          backgroundColor: '#3b82f6',
+          color: '#ffffff',
+          boxShadow: '0 4px 14px rgba(59, 130, 246, 0.15)',
+          '&:hover': {
+            backgroundColor: '#60a5fa',
+            boxShadow: '0 6px 20px rgba(59, 130, 246, 0.3), 0 0 12px rgba(59, 130, 246, 0.15)',
+          },
+        },
+        outlined: {
+          borderColor: '#1c253d',
+          color: '#cbd5e1',
+          '&:hover': {
+            borderColor: '#2e3b5e',
+            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            color: '#f8fafc',
+          },
+        },
+        text: {
+          color: '#cbd5e1',
+          '&:hover': {
+            color: '#f8fafc',
+            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+          },
+        },
+        textError: {
+          color: '#f43f5e',
+          '&:hover': {
+            color: '#fda4af',
+            backgroundColor: 'rgba(244, 63, 94, 0.05)',
           },
         },
       },

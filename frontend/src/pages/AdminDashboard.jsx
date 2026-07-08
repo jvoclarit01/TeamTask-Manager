@@ -198,18 +198,10 @@ const AdminDashboard = () => {
           </Box>
           <Button
             variant="contained"
+            color="primary"
             startIcon={<AddIcon />}
             onClick={() => setOpen(true)}
-            sx={{
-              bgcolor: '#10b981',
-              color: '#090d16',
-              textTransform: 'none',
-              fontWeight: 'bold',
-              px: 2.5,
-              py: 1,
-              borderRadius: '8px',
-              '&:hover': { bgcolor: '#059669' }
-            }}
+            sx={{ px: 2.5, py: 1 }}
           >
             Create Task
           </Button>
@@ -581,31 +573,16 @@ const AdminDashboard = () => {
                 fullWidth
                 variant="outlined"
                 onClick={handleCancel}
-                sx={{
-                  height: '44px', // 44pt touch target size standard
-                  color: '#94a3b8',
-                  borderColor: '#1c253d',
-                  textTransform: 'none',
-                  fontWeight: 'bold',
-                  borderRadius: '10px',
-                  '&:hover': { borderColor: '#2e3b5e', background: 'rgba(255, 255, 255, 0.02)' }
-                }}
+                sx={{ height: '44px' }}
               >
                 Cancel
               </Button>
               <Button
                 fullWidth
                 variant="contained"
+                color="primary"
                 type="submit"
-                sx={{
-                  height: '44px', // 44pt touch target size standard
-                  bgcolor: '#10b981',
-                  color: '#090d16',
-                  textTransform: 'none',
-                  fontWeight: 'bold',
-                  borderRadius: '10px',
-                  '&:hover': { bgcolor: '#059669' }
-                }}
+                sx={{ height: '44px' }}
               >
                 Create Task
               </Button>
@@ -788,31 +765,16 @@ const AdminDashboard = () => {
                 fullWidth
                 variant="outlined"
                 onClick={() => setEditingTask(null)}
-                sx={{
-                  height: '44px',
-                  color: '#94a3b8',
-                  borderColor: '#1c253d',
-                  textTransform: 'none',
-                  fontWeight: 'bold',
-                  borderRadius: '10px',
-                  '&:hover': { borderColor: '#2e3b5e', background: 'rgba(255, 255, 255, 0.02)' }
-                }}
+                sx={{ height: '44px' }}
               >
                 Cancel
               </Button>
               <Button
                 fullWidth
                 variant="contained"
+                color="primary"
                 type="submit"
-                sx={{
-                  height: '44px',
-                  bgcolor: '#10b981',
-                  color: '#090d16',
-                  textTransform: 'none',
-                  fontWeight: 'bold',
-                  borderRadius: '10px',
-                  '&:hover': { bgcolor: '#059669' }
-                }}
+                sx={{ height: '44px' }}
               >
                 Save Changes
               </Button>

@@ -281,9 +281,10 @@ const SidebarAndHeaderLayout = ({ children }) => {
               {notifications.some(n => !n.read) && (
                 <Button 
                   variant="text" 
+                  color="primary"
                   size="small" 
                   onClick={markAllNotificationsAsRead}
-                  sx={{ fontSize: '0.75rem', textTransform: 'none', color: '#10b981', minWidth: 0, p: 0, '&:hover': { color: '#059669', background: 'none' } }}
+                  sx={{ fontSize: '0.75rem', minWidth: 0, p: 0, '&:hover': { background: 'none' } }}
                 >
                   Mark all as read
                 </Button>

@@ -107,19 +107,10 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
                 {task.status === 'pending' && (
                   <Button
                     variant="contained"
+                    color="secondary"
                     size="small"
                     onClick={() => onStatusChange(task.id, 'in_progress')}
-                    sx={{
-                      py: 0.5,
-                      px: 2,
-                      fontSize: '0.75rem',
-                      bgcolor: '#3b82f6',
-                      color: '#fff',
-                      textTransform: 'none',
-                      fontWeight: 'bold',
-                      borderRadius: '8px',
-                      '&:hover': { bgcolor: '#2563eb' }
-                    }}
+                    sx={{ py: 0.5, px: 2, fontSize: '0.75rem' }}
                   >
                     Start
                   </Button>
@@ -127,19 +118,10 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
                 {task.status === 'in_progress' && (
                   <Button
                     variant="contained"
+                    color="primary"
                     size="small"
                     onClick={() => onStatusChange(task.id, 'completed')}
-                    sx={{
-                      py: 0.5,
-                      px: 2,
-                      fontSize: '0.75rem',
-                      bgcolor: '#10b981',
-                      color: '#fff',
-                      textTransform: 'none',
-                      fontWeight: 'bold',
-                      borderRadius: '8px',
-                      '&:hover': { bgcolor: '#059669' }
-                    }}
+                    sx={{ py: 0.5, px: 2, fontSize: '0.75rem' }}
                   >
                     Complete
                   </Button>
