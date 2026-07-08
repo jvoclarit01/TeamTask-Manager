@@ -59,7 +59,7 @@ const Login = () => {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => handleLogin({ id: 999, name: 'Alice Admin', email: 'admin@company.com' }, 'admin')}
+              onClick={() => handleLogin({ id: 999, name: 'Alice', email: 'admin@company.com' }, 'admin')}
               startIcon={<AdminPanelSettingsIcon />}
               sx={{
                 py: 2,
@@ -73,7 +73,7 @@ const Login = () => {
                 },
               }}
             >
-              Log in as Alice Admin
+              Log in as Admin
             </Button>
 
             <Divider sx={{ mb: 4 }} />

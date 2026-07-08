@@ -1,23 +1,44 @@
 import { useState } from 'react';
-import { Card, CardContent, Typography, Box, Chip, Button, AvatarGroup, Avatar, Tooltip, IconButton, Collapse } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Card, CardContent, Typography, Box, Chip, Avatar, Tooltip, IconButton, Collapse, Button } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const statusColors = {
-  pending: { label: 'Pending', color: 'warning' },
-  in_progress: { label: 'In Progress', color: 'info' },
-  completed: { label: 'Completed', color: 'success' },
+  pending: { label: 'Pending', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
+  in_progress: { label: 'In Progress', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)' },
+  completed: { label: 'Completed', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
 };
 
 const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
   const [expanded, setExpanded] = useState(false);
-  const currentStatus = statusColors[task.status] || { label: task.status, color: 'default' };
+  const currentStatus = statusColors[task.status] || { label: task.status, color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.1)' };
   const hasDescription = !!task.description && task.description.trim() !== '';
 
+  // Calculate mock deadline based on created date + 7 days
+  const createdDate = task.created_at ? new Date(task.created_at) : new Date();
+  const deadlineDate = new Date(createdDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const formattedDeadline = deadlineDate.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
   return (
-    <Card sx={{ mb: 2.5 }}>
-      <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+    <Card 
+      sx={{ 
+        mb: 2, 
+        background: '#0e1424', 
+        border: '1px solid #1c253d',
+        borderRadius: '12px',
+        boxShadow: 'none',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          borderColor: 'rgba(59, 130, 246, 0.3)',
+          transform: 'translateY(-2px)'
+        }
+      }}
+    >
+      <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
+        {/* Top Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexGrow: 1, pr: 1 }}>
             {hasDescription && (
@@ -35,83 +56,120 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
                 <ExpandMoreIcon fontSize="small" />
               </IconButton>
             )}
-            <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1.3, color: '#f8fafc' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.05rem', color: '#f8fafc' }}>
               {task.title}
             </Typography>
           </Box>
           <Chip
             label={currentStatus.label}
-            color={currentStatus.color}
             size="small"
-            variant="outlined"
-            sx={{ fontFamily: '"Fira Code", monospace', fontWeight: 600, fontSize: '0.7rem', flexShrink: 0 }}
+            sx={{
+              bgcolor: currentStatus.bg,
+              color: currentStatus.color,
+              fontWeight: 600,
+              fontSize: '0.75rem',
+              borderRadius: '20px',
+              border: 'none',
+              px: 1,
+              flexShrink: 0
+            }}
           />
         </Box>
 
+        {/* Description (Collapsible) */}
         {hasDescription && (
-          <Collapse in={expanded} timeout="auto" unmountOnExit sx={{ mb: 2 }}>
-            <Typography variant="body2" sx={{ color: '#94a3b8', lineHeight: 1.5, pt: 0.5 }}>
+          <Collapse in={expanded} timeout="auto" unmountOnExit sx={{ mb: 3 }}>
+            <Typography variant="body2" sx={{ color: '#94a3b8', lineHeight: 1.6, fontSize: '0.85rem', pt: 0.5 }}>
               {task.description}
             </Typography>
           </Collapse>
         )}
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: hasDescription && expanded ? 0 : 1 }}>
-          {/* Assigned Avatars */}
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="caption" sx={{ mr: 1, color: '#64748b', fontWeight: 500 }}>
-              Assigned:
-            </Typography>
-            <AvatarGroup
-              max={3}
-              sx={{
-                '& .MuiAvatar-root': {
-                  width: 24,
-                  height: 24,
-                  fontSize: '0.7rem',
-                  border: '2px solid #0f172a',
-                  bgcolor: '#3b82f6',
-                  fontFamily: '"Fira Code", monospace',
-                },
-              }}
-            >
+        {/* Footer Area */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mt: 1 }}>
+          {/* Assigned Avatars List with Names */}
+          <Box>
+            <Box sx={{ display: 'flex', gap: 1.5 }}>
               {task.users?.map((userObj) => (
-                <Tooltip key={userObj.id} title={userObj.name} arrow>
-                  <Avatar>{userObj.name.charAt(0)}</Avatar>
-                </Tooltip>
+                <Box key={userObj.id} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 48 }}>
+                  <Tooltip title={userObj.name} arrow>
+                    <Avatar 
+                      sx={{ 
+                        width: 28, 
+                        height: 28, 
+                        bgcolor: '#3b82f6', 
+                        fontSize: '0.75rem', 
+                        fontWeight: 'bold',
+                        mb: 0.5 
+                      }}
+                    >
+                      {userObj.name.charAt(0)}
+                    </Avatar>
+                  </Tooltip>
+                  <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.7rem', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {userObj.name.split(' ')[0]}
+                  </Typography>
+                </Box>
               ))}
-            </AvatarGroup>
+            </Box>
           </Box>
 
-          {/* Action Buttons for Employees */}
-          {isEmployeeView && task.status !== 'completed' && (
-            <Box>
-              {task.status === 'pending' && (
-                <Button
-                  variant="contained"
-                  color="info"
-                  size="small"
-                  startIcon={<PlayArrowIcon />}
-                  onClick={() => onStatusChange(task.id, 'in_progress')}
-                  sx={{ py: 0.5, px: 1.5, fontSize: '0.75rem' }}
-                >
-                  Start
-                </Button>
-              )}
-              {task.status === 'in_progress' && (
-                <Button
-                  variant="contained"
-                  color="success"
-                  size="small"
-                  startIcon={<CheckCircleIcon />}
-                  onClick={() => onStatusChange(task.id, 'completed')}
-                  sx={{ py: 0.5, px: 1.5, fontSize: '0.75rem' }}
-                >
-                  Complete
-                </Button>
-              )}
-            </Box>
-          )}
+          {/* Right Side: Action Buttons for Employees or Deadline */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            {isEmployeeView && task.status !== 'completed' ? (
+              <Box>
+                {task.status === 'pending' && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => onStatusChange(task.id, 'in_progress')}
+                    sx={{
+                      py: 0.5,
+                      px: 2,
+                      fontSize: '0.75rem',
+                      bgcolor: '#3b82f6',
+                      color: '#fff',
+                      textTransform: 'none',
+                      fontWeight: 'bold',
+                      borderRadius: '8px',
+                      '&:hover': { bgcolor: '#2563eb' }
+                    }}
+                  >
+                    Start
+                  </Button>
+                )}
+                {task.status === 'in_progress' && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => onStatusChange(task.id, 'completed')}
+                    sx={{
+                      py: 0.5,
+                      px: 2,
+                      fontSize: '0.75rem',
+                      bgcolor: '#10b981',
+                      color: '#fff',
+                      textTransform: 'none',
+                      fontWeight: 'bold',
+                      borderRadius: '8px',
+                      '&:hover': { bgcolor: '#059669' }
+                    }}
+                  >
+                    Complete
+                  </Button>
+                )}
+              </Box>
+            ) : (
+              <Box sx={{ textAlign: 'right' }}>
+                <Typography variant="caption" sx={{ color: '#475569', display: 'block', mb: 0.5, fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase' }}>
+                  Deadline
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.8rem' }}>
+                  {formattedDeadline}
+                </Typography>
+              </Box>
+            )}
+          </Box>
         </Box>
       </CardContent>
     </Card>
