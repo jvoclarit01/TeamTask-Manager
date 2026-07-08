@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import TaskCard from '../components/TaskCard';
 
 const EmployeeBoard = () => {
-  const { user } = useAuth();
+  const { user, searchQuery } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -42,10 +42,18 @@ const EmployeeBoard = () => {
     }
   };
 
+  // 1. Process tasks matching search query
+  const filteredTasks = tasks.filter((task) => {
+    const matchesSearch =
+      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesSearch;
+  });
+
   const tasksByStatus = {
-    pending: tasks.filter((t) => t.status === 'pending'),
-    in_progress: tasks.filter((t) => t.status === 'in_progress'),
-    completed: tasks.filter((t) => t.status === 'completed'),
+    pending: filteredTasks.filter((t) => t.status === 'pending'),
+    in_progress: filteredTasks.filter((t) => t.status === 'in_progress'),
+    completed: filteredTasks.filter((t) => t.status === 'completed'),
   };
 
   if (loading) {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
-import { ThemeProvider, CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, InputBase, Badge, Container, IconButton, ToggleButtonGroup, ToggleButton, Menu, MenuItem } from '@mui/material';
+import { ThemeProvider, CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, InputBase, Badge, Container, IconButton, ToggleButtonGroup, ToggleButton, Menu, MenuItem, Popover, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
@@ -15,11 +15,19 @@ import { getEmployees } from './services/apiService';
 const DRAWER_WIDTH = 240;
 
 const SidebarAndHeaderLayout = ({ children }) => {
-  const { user, switchRole, switchUser } = useAuth();
+  const { user, switchRole, switchUser, searchQuery, setSearchQuery } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [switchableUsers, setSwitchableUsers] = useState([]);
+
+  // Live simulation notifications
+  const [notifications, setNotifications] = useState([
+    { id: 1, text: 'Alice Admin created task: Redesign logo', date: 'Just now', read: false },
+    { id: 2, text: 'Bob Employee started task: update backend', date: '10 mins ago', read: false },
+    { id: 3, text: 'Charlie Employee completed task: Update UI Components', date: '1 hr ago', read: true },
+  ]);
+  const [notifAnchorEl, setNotifAnchorEl] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -51,6 +59,20 @@ const SidebarAndHeaderLayout = ({ children }) => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  const handleNotifClick = (event) => {
+    setNotifAnchorEl(event.currentTarget);
+  };
+
+  const handleNotifClose = () => {
+    setNotifAnchorEl(null);
+  };
+
+  const handleMarkAllRead = () => {
+    setNotifications(notifications.map((n) => ({ ...n, read: true })));
+  };
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const handleUserSwitch = (selectedUser) => {
     switchUser(selectedUser);
@@ -193,6 +215,8 @@ const SidebarAndHeaderLayout = ({ children }) => {
             <SearchIcon sx={{ color: '#475569', mr: 1, fontSize: '1.2rem' }} />
             <InputBase
               placeholder="Search employees, tasks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               sx={{ color: '#f8fafc', fontSize: '0.85rem', width: '100%' }}
             />
           </Box>
@@ -238,11 +262,71 @@ const SidebarAndHeaderLayout = ({ children }) => {
 
           {/* Right Side Tools */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 3.5 }}>
-            <IconButton sx={{ color: '#94a3b8', p: 0.5 }}>
-              <Badge color="error" variant="dot">
+            <IconButton onClick={handleNotifClick} sx={{ color: '#94a3b8', p: 0.5 }}>
+              <Badge color="error" badgeContent={unreadCount}>
                 <NotificationsNoneIcon />
               </Badge>
             </IconButton>
+
+            {/* Notification Popover */}
+            <Popover
+              open={Boolean(notifAnchorEl)}
+              anchorEl={notifAnchorEl}
+              onClose={handleNotifClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              PaperProps={{
+                sx: {
+                  width: '320px',
+                  background: '#0e1424',
+                  border: '1px solid #1c253d',
+                  color: '#f8fafc',
+                  mt: 1.5,
+                  p: 2,
+                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+                }
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1, borderBottom: '1px solid #1c253d', mb: 1.5 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                  Notifications
+                </Typography>
+                {unreadCount > 0 && (
+                  <Button size="small" onClick={handleMarkAllRead} sx={{ fontSize: '0.75rem', textTransform: 'none', color: '#10b981' }}>
+                    Mark all as read
+                  </Button>
+                )}
+              </Box>
+              {notifications.length === 0 ? (
+                <Typography variant="body2" sx={{ color: '#475569', textAlign: 'center', py: 2 }}>
+                  No new notifications
+                </Typography>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                  {notifications.map((n) => (
+                    <Box key={n.id} sx={{ pb: 1, borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                        {!n.read && (
+                          <Box sx={{ width: 6, height: 6, bgcolor: '#10b981', borderRadius: '50%', mt: 0.8, flexShrink: 0 }} />
+                        )}
+                        <Typography variant="body2" sx={{ fontSize: '0.8rem', color: n.read ? '#94a3b8' : '#f8fafc', fontWeight: n.read ? 500 : 600 }}>
+                          {n.text}
+                        </Typography>
+                      </Box>
+                      <Typography variant="caption" sx={{ color: '#475569', display: 'block', mt: 0.5, pl: n.read ? 0 : 1.8 }}>
+                        {n.date}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Popover>
 
             {/* User Profile Info (Clickable for switch profile dropdown) */}
             <Box 

@@ -18,6 +18,8 @@ export const AuthProvider = ({ children }) => {
     return DEFAULT_ADMIN; // Default to Admin instead of null
   });
 
+  const [searchQuery, setSearchQuery] = useState('');
+
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem('user_session', JSON.stringify(userData));
@@ -47,7 +49,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, switchRole, switchUser }}>
+    <AuthContext.Provider value={{ user, login, logout, switchRole, switchUser, searchQuery, setSearchQuery }}>
       {children}
     </AuthContext.Provider>
   );
