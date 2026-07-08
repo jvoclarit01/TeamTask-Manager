@@ -13,89 +13,47 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
   const currentStatus = statusColors[task.status] || { label: task.status, color: 'default' };
 
   return (
-    <Card 
-      sx={{ 
-        mb: 2, 
-        background: '#0f172a', // Slate 900 (as per dark theme specs)
-        border: '1px solid #1e293b', // Slate 800 border
-        color: '#f8fafc', // Slate 50 foreground
-        transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          borderColor: '#334155', // Slate 700
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 10px rgba(34, 197, 94, 0.1)', // Subtle accent glow
-        }
-      }}
-    >
-      <CardContent sx={{ '&:last-child': { pb: 2 } }}>
+    <Card sx={{ mb: 2.5 }}>
+      <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-          <Typography 
-            variant="h6" 
-            fontWeight="600" 
-            sx={{ 
-              fontFamily: '"Fira Sans", sans-serif',
-              fontSize: '1.1rem',
-              lineHeight: 1.3
-            }}
-          >
+          <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1.3, color: '#f8fafc' }}>
             {task.title}
           </Typography>
-          <Chip 
-            label={currentStatus.label} 
-            color={currentStatus.color} 
-            size="small" 
-            variant="outlined" 
-            sx={{ 
-              fontFamily: '"Fira Code", monospace', 
-              fontWeight: 500,
-              fontSize: '0.75rem' 
-            }}
+          <Chip
+            label={currentStatus.label}
+            color={currentStatus.color}
+            size="small"
+            variant="outlined"
+            sx={{ fontFamily: '"Fira Code", monospace', fontWeight: 600, fontSize: '0.7rem' }}
           />
         </Box>
-        
-        <Typography 
-          variant="body2" 
-          sx={{ 
-            color: '#94a3b8', // Slate 400
-            fontFamily: '"Fira Sans", sans-serif',
-            mb: 2.5,
-            minHeight: '40px',
-            lineHeight: 1.5
-          }}
-        >
+
+        <Typography variant="body2" sx={{ color: '#94a3b8', minHeight: '38px', mb: 2.5, lineHeight: 1.5 }}>
           {task.description || 'No description provided.'}
         </Typography>
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {/* Assigned Employees */}
+          {/* Assigned Avatars */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography 
-              variant="caption" 
-              sx={{ 
-                mr: 1, 
-                color: '#64748b', // Slate 500
-                fontFamily: '"Fira Sans", sans-serif'
-              }}
-            >
+            <Typography variant="caption" sx={{ mr: 1, color: '#64748b', fontWeight: 500 }}>
               Assigned:
             </Typography>
-            <AvatarGroup 
-              max={4}
+            <AvatarGroup
+              max={3}
               sx={{
                 '& .MuiAvatar-root': {
-                  width: 26,
-                  height: 26,
-                  fontSize: '0.75rem',
+                  width: 24,
+                  height: 24,
+                  fontSize: '0.7rem',
                   border: '2px solid #0f172a',
+                  bgcolor: '#3b82f6',
                   fontFamily: '"Fira Code", monospace',
-                }
+                },
               }}
             >
-              {task.users?.map((user) => (
-                <Tooltip key={user.id} title={user.name} arrow>
-                  <Avatar sx={{ bgcolor: '#3b82f6' }}>
-                    {user.name.charAt(0)}
-                  </Avatar>
+              {task.users?.map((userObj) => (
+                <Tooltip key={userObj.id} title={userObj.name} arrow>
+                  <Avatar>{userObj.name.charAt(0)}</Avatar>
                 </Tooltip>
               ))}
             </AvatarGroup>
@@ -111,14 +69,7 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
                   size="small"
                   startIcon={<PlayArrowIcon />}
                   onClick={() => onStatusChange(task.id, 'in_progress')}
-                  sx={{
-                    fontFamily: '"Fira Sans", sans-serif',
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    borderRadius: '6px',
-                    px: 1.5,
-                    height: '30px',
-                  }}
+                  sx={{ py: 0.5, px: 1.5, fontSize: '0.75rem' }}
                 >
                   Start
                 </Button>
@@ -130,18 +81,7 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange }) => {
                   size="small"
                   startIcon={<CheckCircleIcon />}
                   onClick={() => onStatusChange(task.id, 'completed')}
-                  sx={{
-                    fontFamily: '"Fira Sans", sans-serif',
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    borderRadius: '6px',
-                    px: 1.5,
-                    height: '30px',
-                    bgcolor: '#22c55e', // Accent green
-                    '&:hover': {
-                      bgcolor: '#16a34a',
-                    }
-                  }}
+                  sx={{ py: 0.5, px: 1.5, fontSize: '0.75rem' }}
                 >
                   Complete
                 </Button>
