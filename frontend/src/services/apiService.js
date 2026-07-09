@@ -37,6 +37,7 @@ export const getCurrentUser = () => api.get('/user');
 
 // Task endpoints
 export const getEmployees = () => api.get('/users');
+export const createUser = (userData) => api.post('/users', userData);
 export const getTasks = () => api.get('/tasks');
 export const createTask = (taskData) => api.post('/tasks', taskData);
 export const updateTask = (taskId, data) => api.put(`/tasks/${taskId}`, data);

@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::post('/tasks', [TaskController::class, 'store']);
         Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
+        Route::post('/users', [UserController::class, 'store']);
     });
 
     // Task actions available to authenticated users (individual logic handled in controller)

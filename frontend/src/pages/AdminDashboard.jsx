@@ -4,7 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import CloseIcon from '@mui/icons-material/Close';
-import { createTask, updateTask } from '../services/apiService';
+import { createTask, updateTask, createUser } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import TaskCard from '../components/TaskCard';
 
@@ -38,6 +38,15 @@ const AdminDashboard = () => {
   const [editAssignedUserIds, setEditAssignedUserIds] = useState([]);
   const [editDueDate, setEditDueDate] = useState('');
   const [editPriority, setEditPriority] = useState('medium');
+  
+  // Add User States
+  const [openAddUser, setOpenAddUser] = useState(false);
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserRole, setNewUserRole] = useState('employee');
+  const [addUserError, setAddUserError] = useState('');
+  const [addingUser, setAddingUser] = useState(false);
 
   // Filter & Sort States
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
@@ -87,6 +96,58 @@ const AdminDashboard = () => {
     setPriority('medium');
     setAssignedUserIds([]);
     setOpen(false);
+  };
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    if (!newUserName.trim() || !newUserEmail.trim() || !newUserPassword.trim()) {
+      setAddUserError('All fields are required.');
+      return;
+    }
+    if (newUserPassword.length < 8) {
+      setAddUserError('Password must be at least 8 characters.');
+      return;
+    }
+
+    setAddUserError('');
+    setAddingUser(true);
+
+    try {
+      await createUser({
+        name: newUserName,
+        email: newUserEmail,
+        password: newUserPassword,
+        role: newUserRole,
+      });
+
+      addNotification('User Created', `Successfully added teammate: "${newUserName}" (${newUserRole})`);
+      refreshCache(true); // force cache refresh to get new user list
+
+      // Reset Form
+      setNewUserName('');
+      setNewUserEmail('');
+      setNewUserPassword('');
+      setNewUserRole('employee');
+      setOpenAddUser(false);
+    } catch (err) {
+      console.error('Failed to create user', err);
+      if (err.response && err.response.data && err.response.data.message) {
+        setAddUserError(err.response.data.message);
+      } else {
+        setAddUserError('Failed to add teammate. Check your network or if the email is already registered.');
+      }
+    } finally {
+      setAddingUser(false);
+    }
+  };
+
+  const handleCancelAddUser = () => {
+    setNewUserName('');
+    setNewUserEmail('');
+    setNewUserPassword('');
+    setNewUserRole('employee');
+    setAddUserError('');
+    setOpenAddUser(false);
   };
 
   const handleEditClick = (task) => {
@@ -205,6 +266,15 @@ const AdminDashboard = () => {
               {formattedDate}
             </Typography>
           </Box>
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={() => setOpenAddUser(true)}
+            sx={{ px: 2.5, py: 1, width: { xs: '100%', sm: 'auto' } }}
+          >
+            Add Teammate
+          </Button>
           <Button
             variant="contained"
             color="primary"
@@ -863,6 +933,176 @@ const AdminDashboard = () => {
                 sx={{ height: '44px' }}
               >
                 Save Changes
+              </Button>
+            </Box>
+          </form>
+        </Box>
+      </Dialog>
+
+      {/* ADD USER MODAL */}
+      <Dialog
+        open={openAddUser}
+        onClose={handleCancelAddUser}
+        fullScreen={isMobile}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: 'rgba(3, 7, 18, 0.65)',
+              backdropFilter: 'blur(8px)',
+            }
+          }
+        }}
+        PaperProps={{
+          sx: {
+            background: '#0e1424',
+            border: '1px solid #1c253d',
+            borderRadius: { xs: 0, sm: '16px' },
+            width: { xs: '100%', sm: '460px' },
+            maxWidth: { xs: '100%', sm: '460px' },
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
+            m: { xs: 0, sm: 2 },
+            height: { xs: '100%', sm: 'auto' },
+          }
+        }}
+      >
+        <Box sx={{ p: { xs: 2, sm: 4 }, pt: { xs: 1, sm: 4 }, overflowY: 'auto', flexGrow: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: { xs: 2, sm: 4 } }}>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc', letterSpacing: '-0.02em', fontSize: { xs: '1.1rem', sm: '1.25rem' }, lineHeight: 1.2 }}>
+                Add Teammate
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600, display: 'block', mt: 0.5, fontSize: '0.75rem' }}>
+                Create a new user profile and assign their system role
+              </Typography>
+            </Box>
+            <IconButton onClick={handleCancelAddUser} sx={{ color: '#cbd5e1', p: 0.5, '&:hover': { color: '#f8fafc', bgcolor: 'rgba(255,255,255,0.05)' } }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
+
+          <form onSubmit={handleCreateUser}>
+            {addUserError && (
+              <Box sx={{ bgcolor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', p: 1.5, mb: 3 }}>
+                <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 600 }}>
+                  {addUserError}
+                </Typography>
+              </Box>
+            )}
+
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              Full Name
+            </Typography>
+            <TextField
+              fullWidth
+              placeholder="e.g. John Doe"
+              variant="outlined"
+              value={newUserName}
+              onChange={(e) => setNewUserName(e.target.value)}
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  background: '#0b0f19',
+                  borderRadius: '10px',
+                  '& fieldset': { borderColor: '#1c253d' },
+                  '&:hover fieldset': { borderColor: '#2e3b5e' },
+                  '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                },
+                '& input': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' },
+                '& input::placeholder': { color: '#64748b', opacity: 1 }
+              }}
+              required
+            />
+
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              Email Address
+            </Typography>
+            <TextField
+              fullWidth
+              type="email"
+              placeholder="e.g. john@company.com"
+              variant="outlined"
+              value={newUserEmail}
+              onChange={(e) => setNewUserEmail(e.target.value)}
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  background: '#0b0f19',
+                  borderRadius: '10px',
+                  '& fieldset': { borderColor: '#1c253d' },
+                  '&:hover fieldset': { borderColor: '#2e3b5e' },
+                  '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                },
+                '& input': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' },
+                '& input::placeholder': { color: '#64748b', opacity: 1 }
+              }}
+              required
+            />
+
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              Password
+            </Typography>
+            <TextField
+              fullWidth
+              type="password"
+              placeholder="At least 8 characters..."
+              variant="outlined"
+              value={newUserPassword}
+              onChange={(e) => setNewUserPassword(e.target.value)}
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  background: '#0b0f19',
+                  borderRadius: '10px',
+                  '& fieldset': { borderColor: '#1c253d' },
+                  '&:hover fieldset': { borderColor: '#2e3b5e' },
+                  '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                },
+                '& input': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' },
+                '& input::placeholder': { color: '#64748b', opacity: 1 }
+              }}
+              required
+            />
+
+            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+              System Role
+            </Typography>
+            <FormControl fullWidth size="small" sx={{ mb: 4.5 }}>
+              <Select
+                value={newUserRole}
+                onChange={(e) => setNewUserRole(e.target.value)}
+                sx={{
+                  background: '#0b0f19',
+                  color: '#f8fafc',
+                  '& fieldset': { borderColor: '#1c253d' },
+                  '&:hover fieldset': { borderColor: '#2e3b5e' },
+                  '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                  '& .MuiSelect-select': { py: 1.5, fontSize: '0.85rem' }
+                }}
+              >
+                <MenuItem value="employee">Employee</MenuItem>
+                <MenuItem value="admin">Admin</MenuItem>
+              </Select>
+            </FormControl>
+
+            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, pb: { xs: 2, sm: 0 } }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleCancelAddUser}
+                sx={{ height: '44px' }}
+                disabled={addingUser}
+              >
+                Cancel
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                type="submit"
+                sx={{ height: '44px' }}
+                disabled={addingUser}
+              >
+                {addingUser ? <CircularProgress size={24} color="inherit" /> : 'Create User'}
               </Button>
             </Box>
           </form>
