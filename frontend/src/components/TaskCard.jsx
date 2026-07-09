@@ -202,6 +202,7 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {/* Comments Icon Button Trigger */}
             <IconButton
+              id={`task-comment-btn-${task.id}`}
               size="small"
               onClick={() => setDrawerOpen(true)}
               sx={{ color: '#cbd5e1', mr: 2, '&:hover': { color: '#10b981', bgcolor: 'rgba(255,255,255,0.05)' } }}

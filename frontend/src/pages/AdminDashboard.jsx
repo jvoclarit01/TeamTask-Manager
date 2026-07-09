@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
-import { Box, TextField, Button, MenuItem, Select, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, CircularProgress, Chip, Dialog, Popover, Radio, RadioGroup, FormControlLabel, Pagination, IconButton, useMediaQuery, useTheme } from '@mui/material';
+import { useState, useEffect, useCallback } from 'react';
+import { Box, TextField, Button, MenuItem, Select, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, CircularProgress, Chip, Dialog, Popover, Radio, RadioGroup, FormControlLabel, Pagination, IconButton, useMediaQuery, useTheme, Switch, LinearProgress, Menu } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import CloseIcon from '@mui/icons-material/Close';
-import { createTask, updateTask, createUser } from '../services/apiService';
+import MailOutlineIcon from '@mui/icons-material/MailOutlined';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutlined';
+import { createTask, updateTask, createUser, adminUpdateEmployee } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import TaskCard from '../components/TaskCard';
 
@@ -57,6 +60,94 @@ const AdminDashboard = () => {
   // Pagination State
   const [page, setPage] = useState(1);
   const itemsPerPage = 3; // Setting to 3 to easily demonstrate page switching
+
+  // Our Team Panel States
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [skillPopoverAnchor, setSkillPopoverAnchor] = useState(null);
+  const [selectedEmployeeForSkill, setSelectedEmployeeForSkill] = useState(null);
+  const [newSkillInput, setNewSkillInput] = useState('');
+
+  const handleToggleActive = async (emp) => {
+    if (emp.is_active) {
+      const confirmDeactivate = window.confirm(`Are you sure you want to deactivate ${emp.name}?`);
+      if (!confirmDeactivate) return;
+      try {
+        await adminUpdateEmployee(emp.id, { is_active: false });
+        addNotification('Employee Deactivated', `${emp.name} has been deactivated.`);
+        refreshCache(true);
+      } catch (err) {
+        console.error('Failed to deactivate employee', err);
+      }
+    } else {
+      handleReactivate(emp);
+    }
+  };
+
+  const handleReactivate = async (emp) => {
+    try {
+      await adminUpdateEmployee(emp.id, { is_active: true });
+      addNotification('Employee Reactivated', `${emp.name} is now active.`);
+      refreshCache(true);
+    } catch (err) {
+      console.error('Failed to reactivate employee', err);
+    }
+  };
+
+  const handleDeleteSkill = async (emp, skillToDelete) => {
+    const updatedSkills = (emp.skills || []).filter(s => s !== skillToDelete);
+    try {
+      await adminUpdateEmployee(emp.id, { skills: updatedSkills });
+      addNotification('Skills Updated', `Removed skill "${skillToDelete}" from ${emp.name}`);
+      refreshCache(true);
+    } catch (err) {
+      console.error('Failed to delete skill', err);
+    }
+  };
+
+  const handleAddSkillClick = (e, emp) => {
+    setSkillPopoverAnchor(e.currentTarget);
+    setSelectedEmployeeForSkill(emp);
+    setNewSkillInput('');
+  };
+
+  const handleSkillPopoverClose = () => {
+    setSkillPopoverAnchor(null);
+    setSelectedEmployeeForSkill(null);
+  };
+
+  const handleAddSkillSubmit = async () => {
+    if (!newSkillInput.trim() || !selectedEmployeeForSkill) return;
+    const skillToAdd = newSkillInput.trim();
+    const updatedSkills = [...(selectedEmployeeForSkill.skills || []), skillToAdd];
+    try {
+      await adminUpdateEmployee(selectedEmployeeForSkill.id, { skills: updatedSkills });
+      addNotification('Skills Updated', `Added skill "${skillToAdd}" to ${selectedEmployeeForSkill.name}`);
+      refreshCache(true);
+      handleSkillPopoverClose();
+    } catch (err) {
+      console.error('Failed to add skill', err);
+    }
+  };
+
+  const handleMenuOpen = (e, emp) => {
+    setMenuAnchor(e.currentTarget);
+    setSelectedEmployee(emp);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+    setSelectedEmployee(null);
+  };
+
+  const handleCommentOnTask = (taskId) => {
+    const commentBtn = document.getElementById(`task-comment-btn-${taskId}`);
+    if (commentBtn) {
+      commentBtn.click();
+    } else {
+      console.warn(`Comment button task-comment-btn-${taskId} not found in DOM`);
+    }
+  };
 
   useEffect(() => {
     refreshCache(false); // background refresh
@@ -317,84 +408,400 @@ const AdminDashboard = () => {
         ))}
       </Box>
 
-      {/* Main Task List View (Full-Width breathing room) */}
-      <Box sx={{ width: '100%', mb: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#f8fafc', textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.75rem' }}>
-            Team Task Cards
-          </Typography>
-          
-          {/* Filter & Sort Clickable Row */}
-          <Box 
-            onClick={handleFilterClick}
-            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94a3b8', cursor: 'pointer', '&:hover': { color: '#f8fafc' } }}
-          >
-            <FilterListIcon fontSize="small" />
-            <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
-              Filter & Sort
+      {/* Two-Column Responsive Layout */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '7fr 5fr' }, gap: { xs: 3, lg: 4 }, width: '100%', mb: 3 }}>
+        {/* Left Column: Tasks */}
+        <Box sx={{ minWidth: 0 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#f8fafc', textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.75rem' }}>
+              Team Task Cards
             </Typography>
+            
+            {/* Filter & Sort Clickable Row */}
+            <Box 
+              onClick={handleFilterClick}
+              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94a3b8', cursor: 'pointer', '&:hover': { color: '#f8fafc' } }}
+            >
+              <FilterListIcon fontSize="small" />
+              <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
+                Filter & Sort
+              </Typography>
+            </Box>
           </Box>
-        </Box>
 
-        {paginatedTasks.length === 0 ? (
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            py: { xs: 8, md: 15 }, 
-            border: '1px dashed #1c253d', 
-            borderRadius: '12px',
-            background: 'rgba(14, 20, 36, 0.4)'
-          }}>
-            <Typography variant="h6" sx={{ color: '#94a3b8', mb: 1, fontWeight: 'bold', fontSize: '1rem' }}>
-              No results found
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.8rem' }}>
-              Try adjusting your search keywords, assignee filters, or status selections.
-            </Typography>
-          </Box>
-        ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {paginatedTasks.map((task) => (
-              <TaskCard key={task.id} task={task} onEditClick={handleEditClick} />
-            ))}
+          {paginatedTasks.length === 0 ? (
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              py: { xs: 8, md: 15 }, 
+              border: '1px dashed #1c253d', 
+              borderRadius: '12px',
+              background: 'rgba(14, 20, 36, 0.4)'
+            }}>
+              <Typography variant="h6" sx={{ color: '#94a3b8', mb: 1, fontWeight: 'bold', fontSize: '1rem' }}>
+                No results found
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.8rem' }}>
+                Try adjusting your search keywords, assignee filters, or status selections.
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {paginatedTasks.map((task) => (
+                <TaskCard key={task.id} task={task} onEditClick={handleEditClick} />
+              ))}
 
-            {/* Pagination Controls */}
-            {pageCount > 1 && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 1 }}>
-                <Pagination
-                  count={pageCount}
-                  page={activePage}
-                  onChange={(e, val) => setPage(val)}
-                  color="primary"
-                  sx={{
-                    '& .MuiPaginationItem-root': {
-                      color: '#94a3b8',
-                      fontFamily: '"Outfit", sans-serif',
-                      fontWeight: 600,
-                      borderRadius: '8px',
-                      '&:hover': {
-                        bgcolor: 'rgba(16, 185, 129, 0.1)',
-                        color: '#10b981',
-                      },
-                      '&.Mui-selected': {
-                        bgcolor: 'rgba(16, 185, 129, 0.15)',
-                        color: '#10b981',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
-                        fontWeight: 'bold',
+              {/* Pagination Controls */}
+              {pageCount > 1 && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 1 }}>
+                  <Pagination
+                    count={pageCount}
+                    page={activePage}
+                    onChange={(e, val) => setPage(val)}
+                    color="primary"
+                    sx={{
+                      '& .MuiPaginationItem-root': {
+                        color: '#94a3b8',
+                        fontFamily: '"Outfit", sans-serif',
+                        fontWeight: 600,
+                        borderRadius: '8px',
                         '&:hover': {
-                          bgcolor: 'rgba(16, 185, 129, 0.25)',
+                          bgcolor: 'rgba(16, 185, 129, 0.1)',
+                          color: '#10b981',
+                        },
+                        '&.Mui-selected': {
+                          bgcolor: 'rgba(16, 185, 129, 0.15)',
+                          color: '#10b981',
+                          border: '1px solid rgba(16, 185, 129, 0.3)',
+                          fontWeight: 'bold',
+                          '&:hover': {
+                            bgcolor: 'rgba(16, 185, 129, 0.25)',
+                          }
                         }
                       }
-                    }
+                    }}
+                  />
+                </Box>
+              )}
+            </Box>
+          )}
+        </Box>
+
+        {/* Right Column: "Our Team" Panel (Glassmorphic) */}
+        <Box sx={{
+          background: 'rgba(14, 20, 36, 0.4)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid #1c253d',
+          borderRadius: '16px',
+          p: { xs: 2, md: 3 },
+          height: 'fit-content',
+        }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#f8fafc', textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.75rem', mb: 3 }}>
+            Our Team
+          </Typography>
+
+          {employees.length === 0 ? (
+            <Typography variant="body2" sx={{ color: '#64748b' }}>
+              No employees registered.
+            </Typography>
+          ) : (
+            employees.map((emp) => {
+              const activeTasks = emp.tasks ? emp.tasks.filter(t => t.status === 'pending' || t.status === 'in_progress') : [];
+              const activeCount = activeTasks.length;
+
+              const pCount = emp.tasks ? emp.tasks.filter(t => t.status === 'pending').length : 0;
+              const ipCount = emp.tasks ? emp.tasks.filter(t => t.status === 'in_progress').length : 0;
+              const cCount = emp.tasks ? emp.tasks.filter(t => t.status === 'completed').length : 0;
+
+              const statusMap = {
+                active: { label: '🟢 Active', color: 'success' },
+                ooo: { label: '🔴 On Leave (OOO)', color: 'error' },
+                in_meetings: { label: '🟡 In Meetings', color: 'warning' },
+                deep_work: { label: '🔵 Deep Work', color: 'primary' },
+              };
+
+              const getWorkloadLevel = (count) => {
+                if (count <= 1) return { label: 'Low', color: '#10b981', value: 25 };
+                if (count <= 3) return { label: 'Optimal', color: '#f59e0b', value: 65 };
+                return { label: 'Overloaded', color: '#ef4444', value: 100 };
+              };
+
+              return (
+                <Box
+                  key={emp.id}
+                  sx={{
+                    p: 2.5,
+                    mb: 2.5,
+                    background: 'rgba(255, 255, 255, 0.01)',
+                    border: '1px solid rgba(255, 255, 255, 0.03)',
+                    borderRadius: '12px',
+                    opacity: emp.is_active ? 1 : 0.55,
+                    transition: 'opacity 0.2s ease',
+                    '&:last-child': { mb: 0 }
                   }}
-                />
-              </Box>
-            )}
-          </Box>
-        )}
+                >
+                  {/* Top info and status switch */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                    <Box sx={{ minWidth: 0, mr: 2 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#f8fafc', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {emp.name}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#64748b', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {emp.email}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                      <Switch
+                        size="small"
+                        checked={Boolean(emp.is_active)}
+                        onChange={() => handleToggleActive(emp)}
+                        color="success"
+                      />
+                      <IconButton size="small" onClick={(e) => handleMenuOpen(e, emp)} sx={{ color: '#cbd5e1' }}>
+                        <MoreVertIcon sx={{ fontSize: '1.2rem' }} />
+                      </IconButton>
+                    </Box>
+                  </Box>
+
+                  {/* Reactivate button if deactivated */}
+                  {!emp.is_active && (
+                    <Button
+                      variant="outlined"
+                      color="success"
+                      size="small"
+                      onClick={() => handleReactivate(emp)}
+                      sx={{ mt: 0.5, mb: 1.5, py: 0.25, px: 1.5, fontSize: '0.7rem' }}
+                    >
+                      Reactivate
+                    </Button>
+                  )}
+
+                  {/* Status and capacity indicators for active users */}
+                  {emp.is_active && (
+                    <>
+                      <Box sx={{ mb: 1.5 }}>
+                        <Chip
+                          label={statusMap[emp.availability_status]?.label || '🟢 Active'}
+                          size="small"
+                          sx={{
+                            background: 'rgba(255,255,255,0.03)',
+                            color: '#cbd5e1',
+                            border: '1px solid rgba(255,255,255,0.05)',
+                            fontSize: '0.7rem',
+                            height: '22px'
+                          }}
+                        />
+                      </Box>
+
+                      {/* Workload Capacity Meter */}
+                      <Box sx={{ mb: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                          <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.7rem' }}>
+                            Workload Capacity
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: getWorkloadLevel(activeCount).color, fontWeight: 'bold', fontSize: '0.7rem' }}>
+                            {getWorkloadLevel(activeCount).label} ({activeCount} active)
+                          </Typography>
+                        </Box>
+                        <LinearProgress
+                          variant="determinate"
+                          value={getWorkloadLevel(activeCount).value}
+                          sx={{
+                            height: 6,
+                            borderRadius: 3,
+                            bgcolor: 'rgba(255,255,255,0.05)',
+                            '& .MuiLinearProgress-bar': {
+                              bgcolor: getWorkloadLevel(activeCount).color,
+                              borderRadius: 3
+                            }
+                          }}
+                        />
+                      </Box>
+                    </>
+                  )}
+
+                  {/* Task counts */}
+                  <Box sx={{ display: 'flex', gap: 1, mb: emp.is_active && ipCount > 0 ? 1.5 : 2, flexWrap: 'wrap' }}>
+                    <Typography variant="caption" sx={{ background: 'rgba(245, 158, 11, 0.08)', color: '#f59e0b', px: 1.25, py: 0.25, borderRadius: '4px', fontWeight: 700, fontFamily: '"Fira Code", monospace', fontSize: '0.65rem' }}>
+                      P: {pCount}
+                    </Typography>
+                    <Typography variant="caption" sx={{ background: 'rgba(59, 130, 246, 0.08)', color: '#3b82f6', px: 1.25, py: 0.25, borderRadius: '4px', fontWeight: 700, fontFamily: '"Fira Code", monospace', fontSize: '0.65rem' }}>
+                      IP: {ipCount}
+                    </Typography>
+                    <Typography variant="caption" sx={{ background: 'rgba(16, 185, 129, 0.08)', color: '#10b981', px: 1.25, py: 0.25, borderRadius: '4px', fontWeight: 700, fontFamily: '"Fira Code", monospace', fontSize: '0.65rem' }}>
+                      C: {cCount}
+                    </Typography>
+                  </Box>
+
+                  {/* Active Task Links */}
+                  {emp.is_active && ipCount > 0 && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600, display: 'block', mb: 0.5, fontSize: '0.7rem' }}>
+                        Active Tasks:
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                        {emp.tasks.filter(t => t.status === 'in_progress').map((t) => (
+                          <Typography
+                            key={t.id}
+                            variant="caption"
+                            onClick={() => handleCommentOnTask(t.id)}
+                            sx={{
+                              color: '#3b82f6',
+                              cursor: 'pointer',
+                              textDecoration: 'underline',
+                              '&:hover': { color: '#60a5fa' },
+                              display: 'block',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              fontSize: '0.7rem'
+                            }}
+                          >
+                            {t.title}
+                          </Typography>
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+
+                  {/* Skills Management */}
+                  <Box sx={{ mt: 1.5 }}>
+                    <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600, display: 'block', mb: 0.5, fontSize: '0.7rem' }}>
+                      Skills
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center' }}>
+                      {(emp.skills || []).map((skill, sIdx) => (
+                        <Chip
+                          key={sIdx}
+                          label={skill}
+                          size="small"
+                          onDelete={() => handleDeleteSkill(emp, skill)}
+                          sx={{
+                            bgcolor: 'rgba(255,255,255,0.03)',
+                            color: '#cbd5e1',
+                            fontSize: '0.65rem',
+                            height: '20px',
+                            '& .MuiChip-deleteIcon': {
+                              color: '#ef4444',
+                              fontSize: '0.8rem',
+                              '&:hover': { color: '#f87171' }
+                            }
+                          }}
+                        />
+                      ))}
+                      {emp.is_active && (
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleAddSkillClick(e, emp)}
+                          sx={{ p: 0.25, color: '#10b981', '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' } }}
+                        >
+                          <AddIcon sx={{ fontSize: '0.9rem' }} />
+                        </IconButton>
+                      )}
+                    </Box>
+                  </Box>
+                </Box>
+              );
+            })
+          )}
+        </Box>
       </Box>
+
+      {/* Global Popovers and Menus for Our Team Panel */}
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: {
+            background: '#0e1424',
+            border: '1px solid #1c253d',
+            color: '#f8fafc',
+            boxShadow: '0 5px 15px rgba(0,0,0,0.5)',
+          }
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (selectedEmployee) {
+              window.location.href = `mailto:${selectedEmployee.email}`;
+            }
+            handleMenuClose();
+          }}
+          sx={{ fontSize: '0.8rem', color: '#cbd5e1', '&:hover': { color: '#f8fafc', bgcolor: 'rgba(255,255,255,0.02)' } }}
+        >
+          <MailOutlineIcon sx={{ mr: 1, fontSize: '0.95rem' }} /> Send Email
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (selectedEmployee?.tasks) {
+              const activeTasks = selectedEmployee.tasks.filter(t => t.status === 'in_progress');
+              if (activeTasks.length > 0) {
+                handleCommentOnTask(activeTasks[0].id);
+              } else if (selectedEmployee.tasks.length > 0) {
+                handleCommentOnTask(selectedEmployee.tasks[0].id);
+              } else {
+                addNotification('No Tasks', `${selectedEmployee.name} has no tasks to comment on.`);
+              }
+            }
+            handleMenuClose();
+          }}
+          sx={{ fontSize: '0.8rem', color: '#cbd5e1', '&:hover': { color: '#f8fafc', bgcolor: 'rgba(255,255,255,0.02)' } }}
+        >
+          <ChatBubbleOutlineIcon sx={{ mr: 1, fontSize: '0.95rem' }} /> Comment on Task
+        </MenuItem>
+      </Menu>
+
+      <Popover
+        open={Boolean(skillPopoverAnchor)}
+        anchorEl={skillPopoverAnchor}
+        onClose={handleSkillPopoverClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        PaperProps={{
+          sx: {
+            background: '#0e1424',
+            border: '1px solid #1c253d',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+          }
+        }}
+      >
+        <Box sx={{ p: 1.5, display: 'flex', gap: 1, alignItems: 'center' }}>
+          <TextField
+            size="small"
+            placeholder="Add skill..."
+            value={newSkillInput}
+            onChange={(e) => setNewSkillInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleAddSkillSubmit();
+              }
+            }}
+            autoFocus
+            sx={{
+              width: '120px',
+              '& input': { py: 0.75, fontSize: '0.75rem', color: '#f8fafc' },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: '#1c253d' },
+                '&:hover fieldset': { borderColor: '#2e3b5e' },
+                '&.Mui-focused fieldset': { borderColor: '#10b981' }
+              }
+            }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={handleAddSkillSubmit}
+            sx={{ py: 0.5, px: 1, minWidth: 0, fontSize: '0.75rem', height: '32px' }}
+          >
+            Add
+          </Button>
+        </Box>
+      </Popover>
 
       {/* FILTER & SORT DROPDOWN POPOVER */}
       <Popover
