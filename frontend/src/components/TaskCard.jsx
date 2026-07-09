@@ -256,15 +256,15 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
             width: { xs: '100%', sm: '420px' },
             background: '#090d16',
             borderLeft: '1px solid #141b2d',
-            p: 4,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            height: '100%'
+            height: '100%',
+            p: 0 // Reset default paper padding to prevent browser overrides
           }
         }}
       >
-        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', p: 3.5, pb: 2 }}>
           {/* Header */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -311,7 +311,7 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
                 <CircularProgress size={24} />
               </Box>
             ) : comments.length === 0 ? (
-              <Typography variant="body2" sx={{ color: '#475569', fontStyle: 'italic', py: 2 }}>
+              <Typography variant="body2" sx={{ color: '#94a3b8', fontStyle: 'italic', py: 2 }}>
                 No updates or comments yet.
               </Typography>
             ) : (
@@ -336,14 +336,14 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
                     </Avatar>
                     <Box sx={{ flexGrow: 1 }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#cbd5e1', fontSize: '0.8rem' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#f8fafc', fontSize: '0.8rem' }}>
                           {comment.user?.name}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#475569', fontSize: '0.65rem' }}>
+                        <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.65rem' }}>
                           {new Date(comment.created_at).toLocaleDateString()}
                         </Typography>
                       </Box>
-                      <Typography variant="body2" sx={{ color: '#f8fafc', fontSize: '0.8rem', lineHeight: 1.5 }}>
+                      <Typography variant="body2" sx={{ color: '#cbd5e1', fontSize: '0.8rem', lineHeight: 1.5 }}>
                         {comment.content}
                       </Typography>
                     </Box>
@@ -355,7 +355,7 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
         </Box>
 
         {/* Post Comment Form */}
-        <Box component="form" onSubmit={handleCommentSubmit} sx={{ pt: 2, borderTop: '1px solid #141b2d', background: '#090d16' }}>
+        <Box component="form" onSubmit={handleCommentSubmit} sx={{ p: 3.5, pt: 2, borderTop: '1px solid #141b2d', background: '#090d16', flexShrink: 0 }}>
           <TextField
             fullWidth
             size="small"
