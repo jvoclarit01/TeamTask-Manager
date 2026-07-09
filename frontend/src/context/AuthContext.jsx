@@ -55,11 +55,11 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  const clearCache = useCallback(() => {
+  const clearCache = useCallback((shouldSetLoading = false) => {
     setTasks([]);
     setEmployees([]);
-    setTasksLoading(false);
-    setEmployeesLoading(false);
+    setTasksLoading(shouldSetLoading);
+    setEmployeesLoading(shouldSetLoading);
   }, []);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
       });
     } else {
       Promise.resolve().then(() => {
-        clearCache();
+        clearCache(false);
       });
     }
   }, [user, refreshCache, clearCache]);
@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const switchRole = (newRole) => {
-    clearCache();
+    clearCache(true);
     let newUser;
     if (newRole === 'admin') {
       newUser = DEFAULT_ADMIN;
@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const switchUser = (userObj) => {
-    clearCache();
+    clearCache(true);
     const isSelAdmin = userObj.name.includes('Admin') || userObj.role === 'admin';
     const sessionUser = {
       id: userObj.id,
