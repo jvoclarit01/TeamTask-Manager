@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, CircularProgress } from '@mui/material';
+import { Box, Typography, Paper, CircularProgress, IconButton, useMediaQuery, useTheme } from '@mui/material';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import ExpandLess from '@mui/icons-material/ExpandLess';
 import { updateTaskStatus } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import TaskCard from '../components/TaskCard';
@@ -13,9 +15,20 @@ const EmployeeBoard = () => {
     tasksLoading,
     refreshCache
   } = useAuth();
+
+  const muiTheme = useTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   
   const loading = tasks.length === 0 && tasksLoading;
   const [refreshKey, setRefreshKey] = useState(0);
+  const [collapsedSections, setCollapsedSections] = useState({});
+
+  const toggleSection = (status) => {
+    setCollapsedSections(prev => ({
+      ...prev,
+      [status]: !prev[status]
+    }));
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -74,13 +87,13 @@ const EmployeeBoard = () => {
   }
 
   return (
-    <Box sx={{ py: 4, width: '100%' }}>
-      <Typography variant="h5" sx={{ mb: 4, fontWeight: 'bold', color: '#f8fafc' }}>
+    <Box sx={{ py: { xs: 1, sm: 2, md: 4 }, width: '100%' }}>
+      <Typography variant="h5" sx={{ mb: { xs: 2, md: 4 }, fontWeight: 'bold', color: '#f8fafc' }}>
         Active Workload
       </Typography>
 
       {/* Workload Metrics Row */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3, mb: 4 }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: { xs: 2, md: 3 }, mb: { xs: 2, md: 4 } }}>
         {[
           { label: 'My Total Tasks', value: empTotalTasks, highlight: '#3b82f6' },
           { label: 'My Completion Rate', value: `${empCompletionRate}%`, highlight: '#10b981' },
@@ -93,7 +106,7 @@ const EmployeeBoard = () => {
               background: '#0e1424',
               border: '1px solid #1c253d',
               borderRadius: '12px',
-              p: 2.5,
+              p: { xs: 1.5, sm: 2.5 },
               display: 'flex',
               flexDirection: 'column',
               gap: 0.5,
@@ -114,7 +127,7 @@ const EmployeeBoard = () => {
         sx={{
           display: 'grid',
           gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
-          gap: 3,
+          gap: { xs: 2, md: 3 },
           width: '100%',
           justifyContent: 'start',
         }}
@@ -127,89 +140,101 @@ const EmployeeBoard = () => {
               ? 'In Progress'
               : 'Completed';
           const columnTasks = tasksByStatus[status] || [];
+          const isCollapsed = collapsedSections[status];
 
           return (
             <Paper
               key={status}
               sx={{
-                p: 2.5,
+                p: { xs: 1.5, sm: 2, md: 2.5 },
                 background: '#131b2e', // Column background #131B2E
                 border: '1px solid #1c253d',
-                minHeight: '600px',
-                maxHeight: '600px', // Maximum height constraint
-                maxWidth: '500px', // Maximum width constraint
+                minHeight: { xs: 'auto', md: '600px' },
+                maxHeight: { xs: 'auto', md: '600px' },
+                maxWidth: { xs: 'none', md: '500px' },
                 width: '100%',
                 borderRadius: '16px',
                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'stretch', // Ensure children stretch to fill full column width
+                alignItems: 'stretch',
               }}
             >
               {/* Column Header */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, width: '100%', flexShrink: 0 }}>
+              <Box
+                onClick={() => isMobile && toggleSection(status)}
+                sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 1.5, md: 3 }, width: '100%', flexShrink: 0, cursor: { xs: 'pointer', md: 'default' } }}
+              >
                 <Typography variant="h6" sx={{ fontSize: '1rem', color: '#f8fafc', fontWeight: 700 }}>
                   {title}
                 </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontFamily: '"Fira Code", monospace',
-                    px: 1.5,
-                    py: 0.5,
-                    borderRadius: '12px',
-                    background: '#1e293b',
-                    color: '#cbd5e1', // High contrast text color
-                    fontWeight: 600,
-                  }}
-                >
-                  {columnTasks.length}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  {isMobile && (
+                    <IconButton size="small" sx={{ color: '#94a3b8', p: 0.5 }}>
+                      {isCollapsed ? <ExpandMore /> : <ExpandLess />}
+                    </IconButton>
+                  )}
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontFamily: '"Fira Code", monospace',
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: '12px',
+                      background: '#1e293b',
+                      color: '#cbd5e1',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {columnTasks.length}
+                  </Typography>
+                </Box>
               </Box>
 
-              {/* Task Cards List (Flex container stretching items to full width) */}
+              {/* Task Cards List */}
               {columnTasks.length === 0 ? (
                 <Box sx={{ 
                   display: 'flex', 
                   justifyContent: 'center', 
                   alignItems: 'center', 
-                  height: '180px', 
+                  height: { xs: '120px', md: '180px' }, 
                   width: '100%',
-                  border: '1px dashed rgba(255,255,255,0.08)', // Brighter empty border
+                  border: '1px dashed rgba(255,255,255,0.08)',
                   borderRadius: '12px',
                   background: 'rgba(255,255,255,0.01)',
                 }}>
-                  <Typography variant="body2" sx={{ color: '#cbd5e1', fontWeight: 600 }}> {/* High contrast text color */}
+                  <Typography variant="body2" sx={{ color: '#cbd5e1', fontWeight: 600 }}>
                     No tasks assigned
                   </Typography>
                 </Box>
-              ) : (
-                <Box 
-                  sx={{ 
-                    overflowY: 'auto', 
-                    flexGrow: 1, 
-                    minHeight: 0, // Enforce flexbox scroll container boundaries
-                    height: 0,    // Force calculations based on parent Paper constraints
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'stretch', // Ensure cards stretch to fill full box width
-                    p: 1.5,                 // Padding on all sides
-                    pr: 1,                  // Extra right padding for scrollbar
-                    '&::-webkit-scrollbar': { width: '6px' }, 
-                    '&::-webkit-scrollbar-thumb': { background: '#1e293b', borderRadius: '3px' } 
-                  }}
-                >
-                  {columnTasks.map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      isEmployeeView={true}
-                      onStatusChange={handleStatusChange}
-                    />
-                  ))}
-                </Box>
-              )}
+              ) : (!isCollapsed || !isMobile) ? (
+                  <Box 
+                    sx={{ 
+                      overflowY: { xs: 'visible', md: 'auto' }, 
+                      flexGrow: 1, 
+                      minHeight: 0,
+                      height: { xs: 'auto', md: 0 },
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'stretch',
+                      p: { xs: 0.5, sm: 1, md: 1.5 },
+                      pr: { xs: 0.5, sm: 1, md: 1 },
+                      '&::-webkit-scrollbar': { width: '6px' }, 
+                      '&::-webkit-scrollbar-thumb': { background: '#1e293b', borderRadius: '3px' } 
+                    }}
+                  >
+                    {columnTasks.map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        isEmployeeView={true}
+                        onStatusChange={handleStatusChange}
+                      />
+                    ))}
+                  </Box>
+                ) : null
+              }
             </Paper>
           );
         })}

@@ -1,8 +1,9 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
-import { ThemeProvider, CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, InputBase, Badge, Container, IconButton, ToggleButtonGroup, ToggleButton, Menu, MenuItem, Popover, Button, CircularProgress } from '@mui/material';
+import { ThemeProvider, CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, InputBase, Badge, Container, IconButton, ToggleButtonGroup, ToggleButton, Menu, MenuItem, Popover, Button, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import MenuIcon from '@mui/icons-material/Menu';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import theme from './theme';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -14,7 +15,6 @@ import WelcomeOverlay from './components/WelcomeOverlay';
 
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const EmployeeBoard = lazy(() => import('./pages/EmployeeBoard'));
-
 
 const DRAWER_WIDTH = 240;
 
@@ -28,6 +28,10 @@ const SidebarAndHeaderLayout = ({ children }) => {
   const [showWelcome, setShowWelcome] = useState(Boolean(user));
 
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
+
+  const muiTheme = useTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -69,7 +73,6 @@ const SidebarAndHeaderLayout = ({ children }) => {
   const handleUserSwitch = (selectedUser) => {
     switchUser(selectedUser);
     handleMenuClose();
-    // Do not show full-screen welcome overlay on quick user switching to prevent 1.8s load delay
     const isSelAdmin = selectedUser.name.includes('Admin') || selectedUser.role === 'admin';
     if (isSelAdmin) {
       navigate('/admin/dashboard');
@@ -103,12 +106,14 @@ const SidebarAndHeaderLayout = ({ children }) => {
       )}
       {/* Left Sidebar */}
       <Drawer
-        variant="permanent"
+        variant={isMobile ? 'temporary' : 'permanent'}
+        open={isMobile ? mobileDrawerOpen : true}
+        onClose={isMobile ? () => setMobileDrawerOpen(false) : undefined}
         sx={{
-          width: DRAWER_WIDTH,
+          width: { xs: 'auto', md: DRAWER_WIDTH },
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: DRAWER_WIDTH,
+            width: { xs: 280, md: DRAWER_WIDTH },
             boxSizing: 'border-box',
             background: 'linear-gradient(to bottom, rgba(9, 13, 22, 0.95), rgba(9, 13, 22, 0.98)), url("/src/assets/brand_bg.jpg")',
             backgroundSize: 'cover',
@@ -117,18 +122,26 @@ const SidebarAndHeaderLayout = ({ children }) => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            py: 3,
-            px: 2,
+            py: { xs: 1.5, md: 3 },
+            px: { xs: 1.5, md: 2 },
           },
         }}
+        ModalProps={{ keepMounted: true }}
       >
         <Box>
           {/* Logo */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4, px: 1 }}>
-            <SynergyLogo size={32} />
-            <Typography variant="h6" sx={{ fontWeight: 900, fontFamily: '"Outfit", sans-serif', color: '#10b981', letterSpacing: '0.5px', fontSize: '1.05rem' }}>
-              SYNERGY <span style={{ color: '#94a3b8', fontWeight: 500 }}>HRMS</span>
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.5, mb: { xs: 2, md: 4 }, px: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <SynergyLogo size={32} />
+              <Typography variant="h6" sx={{ fontWeight: 900, fontFamily: '"Outfit", sans-serif', color: '#10b981', letterSpacing: '0.5px', fontSize: '1.05rem' }}>
+                SYNERGY <span style={{ color: '#94a3b8', fontWeight: 500 }}>HRMS</span>
+              </Typography>
+            </Box>
+            {isMobile && (
+              <IconButton onClick={() => setMobileDrawerOpen(false)} sx={{ color: '#94a3b8', p: 0.5 }}>
+                <MenuIcon />
+              </IconButton>
+            )}
           </Box>
 
           {/* Navigation Links */}
@@ -140,13 +153,15 @@ const SidebarAndHeaderLayout = ({ children }) => {
                   <ListItemButton
                     component={Link}
                     to={item.path}
+                    onClick={() => isMobile && setMobileDrawerOpen(false)}
                     sx={{
                       borderRadius: '8px',
-                      py: 1,
+                      py: 1.5,
                       px: 1.5,
                       background: isActive ? 'rgba(16, 185, 129, 0.08)' : 'transparent',
                       border: isActive ? '1px solid rgba(16, 185, 129, 0.15)' : '1px solid transparent',
                       color: isActive ? '#10b981' : '#94a3b8',
+                      minHeight: '44px',
                       '&:hover': {
                         background: isActive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 255, 255, 0.03)',
                         color: isActive ? '#10b981' : '#f8fafc',
@@ -166,46 +181,102 @@ const SidebarAndHeaderLayout = ({ children }) => {
             })}
           </List>
         </Box>
+
+        {/* Mobile role switcher in drawer */}
+        {isMobile && user && (
+          <Box sx={{ px: 1, py: 2, borderTop: '1px solid #141b2d' }}>
+            <Typography variant="caption" sx={{ color: '#94a3b8', mb: 1.5, display: 'block', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              View as
+            </Typography>
+            <ToggleButtonGroup
+              value={user.role}
+              exclusive
+              onChange={handleRoleChange}
+              size="small"
+              fullWidth
+              sx={{
+                bgcolor: '#0e1424',
+                border: '1px solid #1c253d',
+                borderRadius: '12px',
+                '& .MuiToggleButton-root': {
+                  color: '#94a3b8',
+                  border: 'none',
+                  px: 2.5,
+                  py: 1,
+                  textTransform: 'none',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  borderRadius: '10px',
+                  transition: 'all 0.2s ease',
+                  '&.Mui-selected': {
+                    bgcolor: user.role === 'admin' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                    color: user.role === 'admin' ? '#10b981' : '#3b82f6',
+                    '&:hover': {
+                      bgcolor: user.role === 'admin' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(59, 130, 246, 0.2)',
+                    }
+                  }
+                }
+              }}
+            >
+              <ToggleButton value="admin" sx={{ flex: 1 }}>Admin</ToggleButton>
+              <ToggleButton value="employee" sx={{ flex: 1 }}>Employee</ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        )}
       </Drawer>
 
       {/* Main Content Area */}
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', width: `calc(100% - ${DRAWER_WIDTH}px)` }}>
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', width: { xs: '100%', md: `calc(100% - ${DRAWER_WIDTH}px)` } }}>
         {/* Top Header */}
         <Box
           sx={{
-            height: 70,
+            minHeight: { xs: 56, md: 70 },
             borderBottom: '1px solid #141b2d',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            px: 4,
+            px: { xs: 2, sm: 3, md: 4 },
+            py: { xs: 1, md: 0 },
+            flexWrap: 'wrap',
+            gap: { xs: 1.5, md: 0 },
             background: '#0b0f19',
+            position: { xs: 'sticky', md: 'static' },
+            top: 0,
+            zIndex: 1100,
           }}
         >
-          {/* Search Box */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              background: '#0e1424',
-              borderRadius: '20px',
-              px: 2,
-              py: 0.5,
-              width: '300px',
-              border: '1px solid #1c253d',
-            }}
-          >
-            <SearchIcon sx={{ color: '#475569', mr: 1, fontSize: '1.2rem' }} />
-            <InputBase
-              placeholder="Search employees, tasks..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              sx={{ color: '#f8fafc', fontSize: '0.85rem', width: '100%' }}
-            />
+          {/* Left: Hamburger + Search */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flex: { xs: '1 1 100%', md: '0 1 auto' }, order: { xs: 2, md: 1 } }}>
+            {isMobile && (
+              <IconButton onClick={() => setMobileDrawerOpen(true)} sx={{ color: '#94a3b8', p: 0.5 }}>
+                <MenuIcon />
+              </IconButton>
+            )}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                flex: { xs: 1, md: 'none' },
+                background: '#0e1424',
+                borderRadius: '20px',
+                px: 2,
+                py: 0.5,
+                width: { xs: '100%', sm: '100%', md: '300px' },
+                border: '1px solid #1c253d',
+              }}
+            >
+              <SearchIcon sx={{ color: '#475569', mr: 1, fontSize: '1.2rem' }} />
+              <InputBase
+                placeholder={isMobile ? 'Search...' : 'Search employees, tasks...'}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                sx={{ color: '#f8fafc', fontSize: '0.85rem', width: '100%' }}
+              />
+            </Box>
           </Box>
 
-          {/* Role Switching Control */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          {/* Center: Role Switching (hidden on mobile) */}
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1.5, order: { xs: 3, md: 2 } }}>
             <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600 }}>
               View as:
             </Typography>
@@ -243,8 +314,8 @@ const SidebarAndHeaderLayout = ({ children }) => {
             </ToggleButtonGroup>
           </Box>
 
-          {/* Right Side Tools */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3.5 }}>
+          {/* Right: Tools */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 3.5 }, order: { xs: 1, md: 3 } }}>
             <IconButton onClick={handleNotifClick} sx={{ color: '#94a3b8', p: 0.5 }}>
               <Badge color="error" badgeContent={unreadCount}>
                 <NotificationsNoneIcon />
@@ -256,11 +327,12 @@ const SidebarAndHeaderLayout = ({ children }) => {
           open={Boolean(notificationAnchorEl)}
           anchorEl={notificationAnchorEl}
           onClose={() => setNotificationAnchorEl(null)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: isMobile ? 'center' : 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: isMobile ? 'center' : 'right' }}
           PaperProps={{
             sx: {
-              width: '320px',
+              width: { xs: 'calc(100% - 32px)', sm: '320px' },
+              maxWidth: { xs: 'calc(100% - 32px)', sm: '320px' },
               background: '#0e1424',
               border: '1px solid #1c253d',
               borderRadius: '12px',
@@ -269,7 +341,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
             }
           }}
         >
-          <Box sx={{ p: 3 }}> {/* Wrap in a Box to enforce padding boundaries */}
+          <Box sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, pb: 1, borderBottom: '1px solid #1c253d' }}>
               <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc' }}>
                 Notifications
@@ -339,7 +411,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
                 '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' }
               }}
             >
-              <Box sx={{ textAlign: 'right' }}>
+              <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
                 <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#f8fafc', fontSize: '0.85rem' }}>
                   {user.name}
                 </Typography>
@@ -374,8 +446,9 @@ const SidebarAndHeaderLayout = ({ children }) => {
                   boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
                   '& .MuiMenuItem-root': {
                     fontSize: '0.85rem',
-                    py: 1,
+                    py: 1.5,
                     px: 2.5,
+                    minHeight: '44px',
                     '&:hover': {
                       background: 'rgba(255, 255, 255, 0.03)',
                     },
@@ -410,7 +483,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
         </Box>
 
         {/* Content Box */}
-        <Container maxWidth="xl" sx={{ flexGrow: 1, px: 4, py: 4 }}>
+        <Container maxWidth="xl" sx={{ flexGrow: 1, px: { xs: 2, sm: 3, md: 4 }, py: { xs: 2, sm: 3, md: 4 } }}>
           {children}
         </Container>
         <Footer />

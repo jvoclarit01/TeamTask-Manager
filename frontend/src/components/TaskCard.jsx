@@ -100,7 +100,7 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
         }
       }}
     >
-      <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}> {/* generous 24px padding */}
+      <CardContent sx={{ p: { xs: 2, md: 3 }, '&:last-child': { pb: { xs: 2, md: 3 } } }}>
         {/* Top Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, flexGrow: 1, pr: 1 }}>

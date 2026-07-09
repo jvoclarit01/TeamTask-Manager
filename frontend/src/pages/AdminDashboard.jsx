@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button, MenuItem, Select, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, CircularProgress, Chip, Dialog, Popover, Radio, RadioGroup, FormControlLabel, Pagination, IconButton } from '@mui/material';
+import { Box, TextField, Button, MenuItem, Select, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, CircularProgress, Chip, Dialog, Popover, Radio, RadioGroup, FormControlLabel, Pagination, IconButton, useMediaQuery, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -18,6 +18,9 @@ const AdminDashboard = () => {
     employeesLoading,
     refreshCache 
   } = useAuth();
+
+  const muiTheme = useTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   
   // Calculate dynamic loading state
   const loading = (tasks.length === 0 && tasksLoading) || (employees.length === 0 && employeesLoading);
@@ -186,17 +189,17 @@ const AdminDashboard = () => {
   return (
     <Box sx={{ py: 1, width: '100%' }}>
       {/* Title Header with Action Button & Date */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
-        <Box>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: '#f8fafc', mb: 0.5 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, md: 4 }, flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ width: { xs: '100%', sm: 'auto' } }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: '#f8fafc', mb: 0.5, fontSize: { xs: '1.15rem', sm: '1.25rem', md: '1.5rem' } }}>
             Task Management Dashboard
           </Typography>
           <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, fontSize: '0.8rem' }}>
             Active Team Tasks ({filteredTasks.length})
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#94a3b8' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 3 }, width: { xs: '100%', sm: 'auto' }, justifyContent: { xs: 'space-between', sm: 'flex-end' } }}>
+          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1, color: '#94a3b8' }}>
             <CalendarMonthIcon fontSize="small" />
             <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
               {formattedDate}
@@ -207,7 +210,7 @@ const AdminDashboard = () => {
             color="primary"
             startIcon={<AddIcon />}
             onClick={() => setOpen(true)}
-            sx={{ px: 2.5, py: 1 }}
+            sx={{ px: 2.5, py: 1, width: { xs: '100%', sm: 'auto' } }}
           >
             Create Task
           </Button>
@@ -215,7 +218,7 @@ const AdminDashboard = () => {
       </Box>
 
       {/* Workload Metrics Row */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3, mb: 4 }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: { xs: 2, md: 3 }, mb: { xs: 2, md: 4 } }}>
         {[
           { label: 'Total Active Tasks', value: totalTasksCount, highlight: '#3b82f6' },
           { label: 'Completion Rate', value: `${completionRate}%`, highlight: '#10b981' },
@@ -228,7 +231,7 @@ const AdminDashboard = () => {
               background: '#0e1424',
               border: '1px solid #1c253d',
               borderRadius: '12px',
-              p: 2.5,
+              p: { xs: 1.5, sm: 2.5 },
               display: 'flex',
               flexDirection: 'column',
               gap: 0.5,
@@ -269,7 +272,7 @@ const AdminDashboard = () => {
             flexDirection: 'column', 
             alignItems: 'center', 
             justifyContent: 'center', 
-            py: 15, 
+            py: { xs: 8, md: 15 }, 
             border: '1px dashed #1c253d', 
             borderRadius: '12px',
             background: 'rgba(14, 20, 36, 0.4)'
@@ -328,11 +331,12 @@ const AdminDashboard = () => {
         anchorEl={filterAnchorEl}
         open={Boolean(filterAnchorEl)}
         onClose={handleFilterClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: isMobile ? 'center' : 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: isMobile ? 'center' : 'right' }}
         PaperProps={{
           sx: {
-            width: '280px',
+            width: { xs: 'calc(100% - 32px)', sm: '280px' },
+            maxWidth: { xs: 'calc(100% - 32px)', sm: '280px' },
             background: '#0e1424',
             border: '1px solid #1c253d',
             borderRadius: '12px',
@@ -438,6 +442,7 @@ const AdminDashboard = () => {
       <Dialog
         open={open}
         onClose={handleCancel}
+        fullScreen={isMobile}
         slotProps={{
           backdrop: {
             sx: {
@@ -450,19 +455,21 @@ const AdminDashboard = () => {
           sx: {
             background: '#0e1424',
             border: '1px solid #1c253d',
-            borderRadius: '16px',
-            width: '460px',
-            maxWidth: '90%',
+            borderRadius: { xs: 0, sm: '16px' },
+            width: { xs: '100%', sm: '460px' },
+            maxWidth: { xs: '100%', sm: '460px' },
             boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
+            m: { xs: 0, sm: 2 },
+            height: { xs: '100%', sm: 'auto' },
           }
         }}
       >
         {/* Inner Wrapper Box to enforce padding boundaries */}
-        <Box sx={{ p: 4 }}>
+        <Box sx={{ p: { xs: 2, sm: 4 }, pt: { xs: 1, sm: 4 }, overflowY: 'auto', flexGrow: 1 }}>
           {/* Header Title Section */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: { xs: 2, sm: 4 } }}>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc', letterSpacing: '-0.02em', fontSize: '1.25rem', lineHeight: 1.2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc', letterSpacing: '-0.02em', fontSize: { xs: '1.1rem', sm: '1.25rem' }, lineHeight: 1.2 }}>
                 Create Task
               </Typography>
               <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600, display: 'block', mt: 0.5, fontSize: '0.75rem' }}>
@@ -549,7 +556,7 @@ const AdminDashboard = () => {
             <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
               Assign Employees
             </Typography>
-            <FormControl fullWidth sx={{ mb: 4.5 }}>
+            <FormControl fullWidth sx={{ mb: { xs: 3, sm: 4.5 } }}>
               <Select
                 multiple
                 displayEmpty
@@ -604,7 +611,7 @@ const AdminDashboard = () => {
             </FormControl>
 
             {/* Priority Select */}
-            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
+            <FormControl fullWidth size="small" sx={{ mb: { xs: 2, sm: 3 } }}>
               <Typography variant="body2" sx={{ color: '#cbd5e1', mb: 1, fontWeight: 'bold' }}>
                 Priority Level
               </Typography>
@@ -624,7 +631,7 @@ const AdminDashboard = () => {
             </FormControl>
 
             {/* Bottom Actions */}
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, pb: { xs: 2, sm: 0 } }}>
               <Button
                 fullWidth
                 variant="outlined"
@@ -651,6 +658,7 @@ const AdminDashboard = () => {
       <Dialog
         open={Boolean(editingTask)}
         onClose={() => setEditingTask(null)}
+        fullScreen={isMobile}
         slotProps={{
           backdrop: {
             sx: {
@@ -663,19 +671,21 @@ const AdminDashboard = () => {
           sx: {
             background: '#0e1424',
             border: '1px solid #1c253d',
-            borderRadius: '16px',
-            width: '460px',
-            maxWidth: '90%',
+            borderRadius: { xs: 0, sm: '16px' },
+            width: { xs: '100%', sm: '460px' },
+            maxWidth: { xs: '100%', sm: '460px' },
             boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
+            m: { xs: 0, sm: 2 },
+            height: { xs: '100%', sm: 'auto' },
           }
         }}
       >
         {/* Inner Wrapper Box to enforce padding boundaries */}
-        <Box sx={{ p: 4 }}>
+        <Box sx={{ p: { xs: 2, sm: 4 }, pt: { xs: 1, sm: 4 }, overflowY: 'auto', flexGrow: 1 }}>
           {/* Header Title Section */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: { xs: 2, sm: 4 } }}>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc', letterSpacing: '-0.02em', fontSize: '1.25rem', lineHeight: 1.2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc', letterSpacing: '-0.02em', fontSize: { xs: '1.1rem', sm: '1.25rem' }, lineHeight: 1.2 }}>
                 Edit Task
               </Typography>
               <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600, display: 'block', mt: 0.5, fontSize: '0.75rem' }}>
@@ -762,7 +772,7 @@ const AdminDashboard = () => {
             <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
               Assign Employees
             </Typography>
-            <FormControl fullWidth sx={{ mb: 4.5 }}>
+            <FormControl fullWidth sx={{ mb: { xs: 3, sm: 4.5 } }}>
               <Select
                 multiple
                 displayEmpty
@@ -817,7 +827,7 @@ const AdminDashboard = () => {
             </FormControl>
 
             {/* Edit Priority Select */}
-            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
+            <FormControl fullWidth size="small" sx={{ mb: { xs: 2, sm: 3 } }}>
               <Typography variant="body2" sx={{ color: '#cbd5e1', mb: 1, fontWeight: 'bold' }}>
                 Priority Level
               </Typography>
@@ -836,7 +846,7 @@ const AdminDashboard = () => {
               </Select>
             </FormControl>
 
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, pb: { xs: 2, sm: 0 } }}>
               <Button
                 fullWidth
                 variant="outlined"
