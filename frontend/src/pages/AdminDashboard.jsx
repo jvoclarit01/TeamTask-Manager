@@ -142,11 +142,18 @@ const AdminDashboard = () => {
   };
 
   const handleCommentOnTask = (taskId) => {
-    const commentBtn = document.getElementById(`task-comment-btn-${taskId}`);
-    if (commentBtn) {
-      commentBtn.click();
-    } else {
-      console.warn(`Comment button task-comment-btn-${taskId} not found in DOM`);
+    const index = filteredTasks.findIndex(t => t.id === taskId);
+    if (index !== -1) {
+      const taskPage = Math.floor(index / itemsPerPage) + 1;
+      setPage(taskPage);
+      setTimeout(() => {
+        const commentBtn = document.getElementById(`task-comment-btn-${taskId}`);
+        if (commentBtn) {
+          commentBtn.click();
+        } else {
+          console.warn(`Comment button task-comment-btn-${taskId} not found in DOM`);
+        }
+      }, 150);
     }
   };
 

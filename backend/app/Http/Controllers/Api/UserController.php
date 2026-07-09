@@ -85,6 +85,8 @@ class UserController extends Controller {
         }
         if (isset($validated['is_active']) && !$validated['is_active']) {
             $user->tokens()->delete();
+            // Detach from incomplete tasks
+            $user->tasks()->where('status', '!=', 'completed')->detach();
         }
         if (isset($validated['skills'])) {
             $user->skills = $validated['skills'];

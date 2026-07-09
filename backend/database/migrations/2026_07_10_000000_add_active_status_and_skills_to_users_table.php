@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_active')->default(true);
-            $table->string('availability_status')->default('active'); // active, ooo, in_meetings, deep_work
+            $table->boolean('is_active')->default(true)->index();
+            $table->string('availability_status')->default('active')->index(); // active, ooo, in_meetings, deep_work
             $table->json('skills')->nullable(); // array of strings
         });
     }
