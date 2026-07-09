@@ -2,6 +2,7 @@ import { Card, CardContent, Typography, Box, Chip, Avatar, Tooltip, Button, Avat
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAuth } from '../context/AuthContext';
+import SynergyLogo from './SynergyLogo';
 
 const statusColors = {
   pending: { label: 'Pending', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
@@ -39,19 +40,27 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
       <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}> {/* generous 24px padding */}
         {/* Top Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexGrow: 1, pr: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.05rem', color: '#f8fafc' }}>
-              {task.title}
-            </Typography>
-            {isAdmin && onEditClick && (
-              <IconButton 
-                size="small" 
-                onClick={() => onEditClick(task)} 
-                sx={{ color: '#cbd5e1', ml: 0.5, p: 0.5, '&:hover': { color: '#10b981', bgcolor: 'rgba(255,255,255,0.05)' } }}
-              >
-                <EditIcon sx={{ fontSize: '1rem' }} />
-              </IconButton>
-            )}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, flexGrow: 1, pr: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <SynergyLogo size={14} sx={{ opacity: 0.85 }} />
+              <Typography variant="caption" sx={{ color: '#475569', fontWeight: 'bold', fontFamily: '"Fira Code", monospace' }}>
+                TSK-{task.id}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.05rem', color: '#f8fafc' }}>
+                {task.title}
+              </Typography>
+              {isAdmin && onEditClick && (
+                <IconButton 
+                  size="small" 
+                  onClick={() => onEditClick(task)} 
+                  sx={{ color: '#cbd5e1', ml: 0.5, p: 0.5, '&:hover': { color: '#10b981', bgcolor: 'rgba(255,255,255,0.05)' } }}
+                >
+                  <EditIcon sx={{ fontSize: '1rem' }} />
+                </IconButton>
+              )}
+            </Box>
           </Box>
           <Chip
             label={currentStatus.label}

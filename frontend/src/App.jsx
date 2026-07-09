@@ -11,6 +11,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import EmployeeBoard from './pages/EmployeeBoard';
 import Footer from './components/Footer';
 import { getEmployees } from './services/apiService';
+import SynergyLogo from './components/SynergyLogo';
+import WelcomeOverlay from './components/WelcomeOverlay';
 
 const DRAWER_WIDTH = 240;
 
@@ -21,6 +23,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [switchableUsers, setSwitchableUsers] = useState([]);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
 
@@ -45,6 +48,12 @@ const SidebarAndHeaderLayout = ({ children }) => {
     };
   }, [user]);
 
+  useEffect(() => {
+    if (user && switchableUsers.length === 0) {
+      setShowWelcome(true);
+    }
+  }, [user, switchableUsers]);
+
   if (!user) return <Box sx={{ width: '100%' }}>{children}</Box>;
 
   const handleProfileClick = (event) => {
@@ -64,6 +73,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
   const handleUserSwitch = (selectedUser) => {
     switchUser(selectedUser);
     handleMenuClose();
+    setShowWelcome(true);
     const isSelAdmin = selectedUser.name.includes('Admin') || selectedUser.role === 'admin';
     if (isSelAdmin) {
       navigate('/admin/dashboard');
@@ -91,7 +101,10 @@ const SidebarAndHeaderLayout = ({ children }) => {
   ];
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', background: '#0b0f19' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', background: '#090d16' }}>
+      {showWelcome && (
+        <WelcomeOverlay user={user} onClose={() => setShowWelcome(false)} />
+      )}
       {/* Left Sidebar */}
       <Drawer
         variant="permanent"
@@ -101,7 +114,9 @@ const SidebarAndHeaderLayout = ({ children }) => {
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
-            background: '#0b0f19',
+            background: 'linear-gradient(to bottom, rgba(9, 13, 22, 0.95), rgba(9, 13, 22, 0.98)), url("/src/assets/brand_bg.jpg")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'left center',
             borderRight: '1px solid #141b2d',
             display: 'flex',
             flexDirection: 'column',
@@ -114,22 +129,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
         <Box>
           {/* Logo */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4, px: 1 }}>
-            <Box
-              sx={{
-                width: 28,
-                height: 28,
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 'bold',
-                color: '#fff',
-                fontSize: '0.9rem',
-              }}
-            >
-              S
-            </Box>
+            <SynergyLogo size={32} />
             <Typography variant="h6" sx={{ fontWeight: 900, fontFamily: '"Outfit", sans-serif', color: '#10b981', letterSpacing: '0.5px', fontSize: '1.05rem' }}>
               SYNERGY <span style={{ color: '#94a3b8', fontWeight: 500 }}>HRMS</span>
             </Typography>
