@@ -76,6 +76,10 @@ class UserController extends Controller {
             'skills.*' => 'string|max:50',
         ]);
 
+        if ($request->user()->id === $user->id && isset($validated['is_active']) && !$validated['is_active']) {
+            return response()->json(['message' => 'You cannot deactivate your own account.'], 403);
+        }
+
         if (isset($validated['is_active'])) {
             $user->is_active = $validated['is_active'];
         }

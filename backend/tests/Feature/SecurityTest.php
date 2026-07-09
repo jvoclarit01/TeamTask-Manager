@@ -246,4 +246,15 @@ class SecurityTest extends TestCase
             ->getJson('/api/tasks');
         $response2->assertStatus(401);
     }
+
+    public function test_admin_cannot_deactivate_self()
+    {
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/users/{$this->admin->id}/admin-update", [
+                'is_active' => false,
+            ]);
+
+        $response->assertStatus(403)
+            ->assertJson(['message' => 'You cannot deactivate your own account.']);
+    }
 }
