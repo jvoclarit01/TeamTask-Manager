@@ -3,8 +3,8 @@ import { getTasks, getEmployees, getMyTasks, login as apiLogin, setAuthToken } f
 
 const AuthContext = createContext(null);
 
-const DEFAULT_ADMIN = { id: 2, name: 'Alice Admin', email: 'admin@company.com', role: 'admin' };
-const DEFAULT_EMPLOYEE = { id: 3, name: 'Bob Employee', email: 'bob@company.com', role: 'employee' };
+const DEFAULT_ADMIN = { id: 1, name: 'Admin', email: 'admin@company.com', role: 'admin' };
+const DEFAULT_EMPLOYEE = { id: 2, name: 'Yosh Batula', email: 'yoshiem@gmail.com', role: 'employee' };
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {

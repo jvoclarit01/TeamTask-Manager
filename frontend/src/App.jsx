@@ -39,7 +39,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
       try {
         const res = await getEmployees();
         if (active) {
-          const adminUser = { id: 999, name: 'Alice Admin', email: 'admin@company.com', role: 'admin' };
+          const adminUser = { id: 999, name: 'Admin', email: 'admin@company.com', role: 'admin' };
           setSwitchableUsers([adminUser, ...res.data]);
         }
       } catch (err) {
