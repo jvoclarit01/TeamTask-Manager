@@ -16,4 +16,12 @@ export const getMyTasks = (userId) => api.get(`/my-tasks/${userId}`);
 export const updateTaskStatus = (taskId, status) => api.patch(`/tasks/${taskId}/status`, { status });
 export const updateTask = (taskId, data) => api.put(`/tasks/${taskId}`, data);
 
+export const getComments = (taskId) => {
+  return api.get(`/tasks/${taskId}/comments`);
+};
+
+export const addComment = (taskId, commentData) => {
+  return api.post(`/tasks/${taskId}/comments`, commentData);
+};
+
 export default api;

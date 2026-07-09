@@ -10,10 +10,15 @@ class Task extends Model
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
 
-    protected $fillable = ['title', 'description', 'status', 'due_date'];
+    protected $fillable = ['title', 'description', 'status', 'due_date', 'priority'];
 
     public function users()
     {
         return $this->belongsToMany(User::class, 'task_user');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->orderBy('created_at', 'desc');
     }
 }

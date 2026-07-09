@@ -7,6 +7,7 @@ use App\Http\Requests\Api\StoreTaskRequest;
 use App\Http\Requests\Api\UpdateTaskStatusRequest;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Comment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -33,6 +34,7 @@ class TaskController extends Controller
             'description' => $validated['description'] ?? null,
             'due_date' => $validated['due_date'] ?? null,
             'status' => 'pending',
+            'priority' => $request->input('priority', 'medium'),
         ]);
 
         $task->users()->sync($validated['user_ids']);
@@ -58,6 +60,7 @@ class TaskController extends Controller
             'description' => $validated['description'] ?? null,
             'due_date' => $validated['due_date'] ?? null,
             'status' => $validated['status'] ?? $task->status,
+            'priority' => $request->input('priority', 'medium'),
         ]);
 
         $task->users()->sync($validated['user_ids']);
@@ -84,5 +87,30 @@ class TaskController extends Controller
             'message' => 'Task status updated succesfully',
             'task' => $task->load('users:id,name')
         ]);
+    }
+
+    public function getComments($id)
+    {
+        $comments = Comment::with('user')
+            ->where('task_id', $id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+        return response()->json($comments);
+    }
+
+    public function addComment(Request $request, $id)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'content' => 'required|string',
+        ]);
+
+        $comment = Comment::create([
+            'task_id' => $id,
+            'user_id' => $request->input('user_id'),
+            'content' => $request->input('content'),
+        ]);
+
+        return response()->json($comment->load('user'), 201);
     }
 }

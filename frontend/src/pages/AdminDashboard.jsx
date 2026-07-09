@@ -19,11 +19,13 @@ const AdminDashboard = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [open, setOpen] = useState(false);
   const [dueDate, setDueDate] = useState('');
+  const [priority, setPriority] = useState('medium');
   const [editingTask, setEditingTask] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editAssignedUserIds, setEditAssignedUserIds] = useState([]);
   const [editDueDate, setEditDueDate] = useState('');
+  const [editPriority, setEditPriority] = useState('medium');
 
   // Filter & Sort States
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
@@ -68,11 +70,13 @@ const AdminDashboard = () => {
         description,
         due_date: dueDate || null,
         user_ids: assignedUserIds,
+        priority,
       });
       addNotification('Task Created', `Admin assigned a new task: "${title}"`);
       setTitle('');
       setDescription('');
       setDueDate('');
+      setPriority('medium');
       setAssignedUserIds([]);
       setOpen(false);
       setPage(1);
@@ -86,6 +90,7 @@ const AdminDashboard = () => {
     setTitle('');
     setDescription('');
     setDueDate('');
+    setPriority('medium');
     setAssignedUserIds([]);
     setOpen(false);
   };
@@ -96,6 +101,7 @@ const AdminDashboard = () => {
     setEditDescription(task.description || '');
     setEditDueDate(task.due_date || '');
     setEditAssignedUserIds(task.users ? task.users.map((u) => u.id) : []);
+    setEditPriority(task.priority || 'medium');
   };
 
   const handleEditSubmit = async (e) => {
@@ -108,6 +114,7 @@ const AdminDashboard = () => {
         description: editDescription,
         due_date: editDueDate || null,
         user_ids: editAssignedUserIds,
+        priority: editPriority,
       });
       addNotification('Task Updated', `Admin updated task details: "${editTitle}"`);
       setEditingTask(null);
