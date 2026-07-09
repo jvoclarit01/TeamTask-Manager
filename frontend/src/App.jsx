@@ -347,7 +347,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
                 <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#f8fafc', fontSize: '0.85rem' }}>
                   {user.name}
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#475569', display: 'block', fontSize: '0.75rem', textTransform: 'capitalize' }}>
+                <Typography variant="caption" sx={{ color: '#94a3b8', display: 'block', fontSize: '0.75rem', textTransform: 'capitalize' }}>
                   {user.role === 'admin' ? 'Admin' : 'Employee'}
                 </Typography>
               </Box>
@@ -393,7 +393,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
               }}
             >
               <Box sx={{ px: 2.5, py: 1, borderBottom: '1px solid #1c253d', mb: 0.5 }}>
-                <Typography variant="caption" sx={{ color: '#475569', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Switch User
                 </Typography>
               </Box>
