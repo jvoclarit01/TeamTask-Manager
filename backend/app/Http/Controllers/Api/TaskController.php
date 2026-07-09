@@ -27,6 +27,7 @@ class TaskController extends Controller
             'due_date' => 'nullable|date',
             'user_ids' => 'required|array',
             'user_ids.*' => 'exists:users,id',
+            'priority' => 'nullable|string|in:low,medium,high',
         ]);
 
         $task = Task::create([
@@ -34,7 +35,7 @@ class TaskController extends Controller
             'description' => $validated['description'] ?? null,
             'due_date' => $validated['due_date'] ?? null,
             'status' => 'pending',
-            'priority' => $request->input('priority', 'medium'),
+            'priority' => $validated['priority'] ?? 'medium',
         ]);
 
         $task->users()->sync($validated['user_ids']);
@@ -53,6 +54,7 @@ class TaskController extends Controller
             'status' => 'sometimes|string|in:pending,in_progress,completed',
             'user_ids' => 'required|array',
             'user_ids.*' => 'exists:users,id',
+            'priority' => 'nullable|string|in:low,medium,high',
         ]);
 
         $task->update([
@@ -60,7 +62,7 @@ class TaskController extends Controller
             'description' => $validated['description'] ?? null,
             'due_date' => $validated['due_date'] ?? null,
             'status' => $validated['status'] ?? $task->status,
-            'priority' => $request->input('priority', 'medium'),
+            'priority' => $validated['priority'] ?? $task->priority,
         ]);
 
         $task->users()->sync($validated['user_ids']);
