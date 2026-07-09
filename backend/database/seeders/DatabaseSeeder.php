@@ -35,9 +35,12 @@ class DatabaseSeeder extends Seeder
         ], [
             'name' => 'Yosh Batula',
             'password' => bcrypt('password123'),
-            'availability_status' => \App\Enums\AvailabilityStatus::ACTIVE,
-            'skills' => ['Frontend', 'React', 'CSS'],
         ]);
+        
+        $employee->availability_status = \App\Enums\AvailabilityStatus::ACTIVE;
+        $employee->skills = ['Frontend', 'React', 'CSS'];
+        $employee->save();
+        
         $employee->assignRole($employeeRole);
     }
 }
