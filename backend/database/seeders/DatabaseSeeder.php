@@ -28,5 +28,14 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password123'),
         ]);
         $admin->assignRole($adminRole);
+
+        // 3. Create Employee Users
+        $employee = User::firstOrCreate([
+            'email' => 'yoshiem@gmail.com',
+        ], [
+            'name' => 'Yosh Batula',
+            'password' => bcrypt('password123'),
+        ]);
+        $employee->assignRole($employeeRole);
     }
 }
