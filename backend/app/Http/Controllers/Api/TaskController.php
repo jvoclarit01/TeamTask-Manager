@@ -61,34 +61,38 @@ class TaskController extends Controller
             return $task->load('users');
         }
 
-        // Admin full update
-        $validated = $request->validate([
-            'title'       => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
-            'due_date'    => 'nullable|date',
-            'user_ids'    => 'sometimes|array|min:1',
-            'user_ids.*'  => [
-                Rule::exists('users', 'id')->where('is_active', true)
-            ],
-            'priority'    => 'nullable|in:low,medium,high',
-            'status'      => 'nullable|in:pending,in_progress,completed',
-        ]);
-
-        DB::transaction(function () use ($task, $validated) {
-            if (isset($validated['user_ids'])) {
-                $task->users()->sync($validated['user_ids']);
-            }
-
-            $task->update([
-                'title'       => $validated['title'] ?? $task->title,
-                'description' => $validated['description'] ?? $task->description,
-                'due_date'    => $validated['due_date'] ?? $task->due_date,
-                'priority'    => $validated['priority'] ?? $task->priority,
-                'status'      => $validated['status'] ?? $task->status,
+        if ($user->hasRole('admin')) {
+            // Admin full update
+            $validated = $request->validate([
+                'title'       => 'sometimes|string|max:255',
+                'description' => 'nullable|string',
+                'due_date'    => 'nullable|date',
+                'user_ids'    => 'sometimes|array|min:1',
+                'user_ids.*'  => [
+                    Rule::exists('users', 'id')->where('is_active', true)
+                ],
+                'priority'    => 'nullable|in:low,medium,high',
+                'status'      => 'nullable|in:pending,in_progress,completed',
             ]);
-        });
 
-        return $task->load('users');
+            DB::transaction(function () use ($task, $validated) {
+                if (isset($validated['user_ids'])) {
+                    $task->users()->sync($validated['user_ids']);
+                }
+
+                $updateData = [];
+                foreach (['title', 'description', 'due_date', 'priority', 'status'] as $field) {
+                    if (array_key_exists($field, $validated)) {
+                        $updateData[$field] = $validated[$field];
+                    }
+                }
+                $task->update($updateData);
+            });
+
+            return $task->load('users');
+        } else {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
     }
 
     // Delete a task (Admin)

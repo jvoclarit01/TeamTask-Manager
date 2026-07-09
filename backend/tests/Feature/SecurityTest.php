@@ -292,4 +292,41 @@ class SecurityTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['user_ids.0']);
     }
+
+    public function test_user_without_roles_cannot_update_task()
+    {
+        $userWithoutRoles = User::factory()->create(['email' => 'norole@company.com']);
+        $task = Task::create(['title' => 'Existing Task', 'status' => 'pending', 'priority' => 'medium']);
+
+        $response = $this->actingAs($userWithoutRoles, 'sanctum')
+            ->putJson("/api/tasks/{$task->id}", [
+                'status' => 'completed',
+            ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_set_nullable_fields_to_null()
+    {
+        $task = Task::create([
+            'title' => 'Task Title',
+            'description' => 'Some description',
+            'due_date' => '2026-12-31',
+            'status' => 'pending',
+            'priority' => 'medium'
+        ]);
+        $task->users()->sync([$this->employee1->id]);
+
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/tasks/{$task->id}", [
+                'description' => null,
+                'due_date' => null,
+            ]);
+
+        $response->assertStatus(200);
+
+        $freshTask = $task->fresh();
+        $this->assertNull($freshTask->description);
+        $this->assertNull($freshTask->due_date);
+    }
 }
