@@ -31,7 +31,7 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             'is_active' => true,
-            'availability_status' => 'active',
+            'availability_status' => \App\Enums\AvailabilityStatus::ACTIVE,
             'skills' => null,
         ];
     }
@@ -53,6 +53,26 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_active' => false,
+        ]);
+    }
+
+    /**
+     * Indicate the user's availability status.
+     */
+    public function status(\App\Enums\AvailabilityStatus $status): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'availability_status' => $status,
+        ]);
+    }
+
+    /**
+     * Indicate the user's skills.
+     */
+    public function withSkills(array $skills): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'skills' => $skills,
         ]);
     }
 }
