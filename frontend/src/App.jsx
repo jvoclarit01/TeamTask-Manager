@@ -1,18 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
-import { ThemeProvider, CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, InputBase, Badge, Container, IconButton, ToggleButtonGroup, ToggleButton, Menu, MenuItem, Popover, Button } from '@mui/material';
+import { ThemeProvider, CssBaseline, Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Avatar, InputBase, Badge, Container, IconButton, ToggleButtonGroup, ToggleButton, Menu, MenuItem, Popover, Button, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import theme from './theme';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import AdminDashboard from './pages/AdminDashboard';
-import EmployeeBoard from './pages/EmployeeBoard';
 import Footer from './components/Footer';
 import { getEmployees } from './services/apiService';
 import SynergyLogo from './components/SynergyLogo';
 import WelcomeOverlay from './components/WelcomeOverlay';
+
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const EmployeeBoard = lazy(() => import('./pages/EmployeeBoard'));
+
 
 const DRAWER_WIDTH = 240;
 
@@ -431,31 +433,37 @@ function App() {
       <AuthProvider>
         <Router>
           <SidebarAndHeaderLayout>
-            <Routes>
-              {/* Admin View */}
-              <Route
-                path="/admin/dashboard"
-                element={
-                  <ProtectedRoute allowedRoles={['admin']}>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
+            <Suspense fallback={
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+                <CircularProgress color="primary" />
+              </Box>
+            }>
+              <Routes>
+                {/* Admin View */}
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <ProtectedRoute allowedRoles={['admin']}>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Employee View */}
-              <Route
-                path="/employee/board"
-                element={
-                  <ProtectedRoute allowedRoles={['employee']}>
-                    <EmployeeBoard />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Employee View */}
+                <Route
+                  path="/employee/board"
+                  element={
+                    <ProtectedRoute allowedRoles={['employee']}>
+                      <EmployeeBoard />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Default Fallbacks */}
-              <Route path="/" element={<RootRedirect />} />
-              <Route path="*" element={<RootRedirect />} />
-            </Routes>
+                {/* Default Fallbacks */}
+                <Route path="/" element={<RootRedirect />} />
+                <Route path="*" element={<RootRedirect />} />
+              </Routes>
+            </Suspense>
           </SidebarAndHeaderLayout>
         </Router>
       </AuthProvider>

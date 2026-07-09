@@ -85,7 +85,7 @@ const EmployeeBoard = () => {
   return (
     <Box sx={{ py: 4, width: '100%' }}>
       <Typography variant="h5" sx={{ mb: 4, fontWeight: 'bold', color: '#f8fafc' }}>
-        My Work Board
+        Active Workload
       </Typography>
 
       {/* Workload Metrics Row */}
