@@ -21,7 +21,7 @@ const EmployeeBoard = () => {
     if (user?.id) {
       refreshCache(false); // background refresh
     }
-  }, [user, refreshKey]);
+  }, [user, refreshKey, refreshCache]);
 
   const handleStatusChange = async (taskId, newStatus) => {
     const taskObj = tasks.find(t => t.id === taskId);

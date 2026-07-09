@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { getTasks, getEmployees, getMyTasks } from '../services/apiService';
 
 const AuthContext = createContext(null);
@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
   const [tasksLoading, setTasksLoading] = useState(false);
   const [employeesLoading, setEmployeesLoading] = useState(false);
 
-  const refreshCache = async (showLoadingSpinner = false) => {
+  const refreshCache = useCallback(async (showLoadingSpinner = false) => {
     if (!user) return;
     
     if (showLoadingSpinner) {
@@ -53,22 +53,26 @@ export const AuthProvider = ({ children }) => {
       setTasksLoading(false);
       setEmployeesLoading(false);
     }
-  };
+  }, [user]);
 
-  const clearCache = () => {
+  const clearCache = useCallback(() => {
     setTasks([]);
     setEmployees([]);
     setTasksLoading(false);
     setEmployeesLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     if (user) {
-      refreshCache(true);
+      Promise.resolve().then(() => {
+        refreshCache(true);
+      });
     } else {
-      clearCache();
+      Promise.resolve().then(() => {
+        clearCache();
+      });
     }
-  }, [user]);
+  }, [user, refreshCache, clearCache]);
 
   const [notifications, setNotifications] = useState([
     { id: 1, title: 'Task Created', message: 'Alice Admin created task: Redesign logo', time: 'Just now', read: false },
