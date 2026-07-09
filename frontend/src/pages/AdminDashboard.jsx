@@ -240,17 +240,6 @@ const AdminDashboard = () => {
               display: 'flex',
               flexDirection: 'column',
               gap: 0.5,
-              position: 'relative',
-              overflow: 'hidden',
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                bottom: 0,
-                width: '4px',
-                background: stat.highlight
-              }
             }}
           >
             <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 600, textTransform: 'uppercase' }}>
