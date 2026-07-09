@@ -1,4 +1,5 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
+import { getTasks, getEmployees, getMyTasks } from '../services/apiService';
 
 const AuthContext = createContext(null);
 
@@ -19,6 +20,55 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [searchQuery, setSearchQuery] = useState('');
+
+  const [tasks, setTasks] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(false);
+  const [employeesLoading, setEmployeesLoading] = useState(false);
+
+  const refreshCache = async (showLoadingSpinner = false) => {
+    if (!user) return;
+    
+    if (showLoadingSpinner) {
+      setTasksLoading(true);
+      setEmployeesLoading(true);
+    }
+    
+    try {
+      // Concurrently fetch tasks and employees
+      const tasksPromise = user.role === 'admin' 
+        ? getTasks() 
+        : getMyTasks(user.id);
+        
+      const [tasksRes, employeesRes] = await Promise.all([
+        tasksPromise,
+        getEmployees()
+      ]);
+      
+      setTasks(tasksRes.data);
+      setEmployees(employeesRes.data);
+    } catch (err) {
+      console.error('Failed to update dashboard cache', err);
+    } finally {
+      setTasksLoading(false);
+      setEmployeesLoading(false);
+    }
+  };
+
+  const clearCache = () => {
+    setTasks([]);
+    setEmployees([]);
+    setTasksLoading(false);
+    setEmployeesLoading(false);
+  };
+
+  useEffect(() => {
+    if (user) {
+      refreshCache(true);
+    } else {
+      clearCache();
+    }
+  }, [user]);
 
   const [notifications, setNotifications] = useState([
     { id: 1, title: 'Task Created', message: 'Alice Admin created task: Redesign logo', time: 'Just now', read: false },
@@ -54,12 +104,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const switchRole = (newRole) => {
+    clearCache();
     const newUser = newRole === 'admin' ? DEFAULT_ADMIN : DEFAULT_EMPLOYEE;
     setUser(newUser);
     localStorage.setItem('user_session', JSON.stringify(newUser));
   };
 
   const switchUser = (userObj) => {
+    clearCache();
     const isSelAdmin = userObj.name.includes('Admin') || userObj.role === 'admin';
     const sessionUser = {
       id: userObj.id,
@@ -84,6 +136,12 @@ export const AuthProvider = ({ children }) => {
         notifications,
         addNotification,
         markAllNotificationsAsRead,
+        tasks,
+        employees,
+        tasksLoading,
+        employeesLoading,
+        refreshCache,
+        clearCache,
       }}
     >
       {children}
