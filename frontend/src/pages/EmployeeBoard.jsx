@@ -13,7 +13,8 @@ const EmployeeBoard = () => {
     addNotification,
     tasks,
     tasksLoading,
-    refreshCache
+    refreshCache,
+    updateUserSession
   } = useAuth();
 
   const muiTheme = useTheme();
@@ -36,6 +37,7 @@ const EmployeeBoard = () => {
     try {
       await updateEmployeeStatus(user.id, newStatus);
       addNotification('Status Updated', `Your availability is now set to ${newStatus.toUpperCase()}`);
+      updateUserSession({ availability_status: newStatus });
       refreshCache(true);
     } catch (err) {
       console.error('Failed to update status', err);
@@ -107,12 +109,17 @@ const EmployeeBoard = () => {
 
   return (
     <Box sx={{ py: { xs: 1, sm: 2, md: 4 }, width: '100%' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, md: 4 } }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#f8fafc' }}>
-          Active Workload
-        </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, md: 4 }, flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#f8fafc', mb: 0.5 }}>
+            {user?.name}'s Board
+          </Typography>
+          <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600 }}>
+            Active assignments and progress
+          </Typography>
+        </Box>
 
-        <FormControl size="small" sx={{ minWidth: 150, background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+        <FormControl size="small" sx={{ minWidth: 160, background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
           <InputLabel id="availability-label" sx={{ color: '#94a3b8' }}>Status</InputLabel>
           <Select
             labelId="availability-label"
@@ -122,7 +129,7 @@ const EmployeeBoard = () => {
             sx={{ color: '#f8fafc', '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.1)' } }}
           >
             <MenuItem value="active">🟢 Active</MenuItem>
-            <MenuItem value="ooo">🔴 On Leave</MenuItem>
+            <MenuItem value="ooo">🔴 On Leave (OOO)</MenuItem>
             <MenuItem value="in_meetings">🟡 In Meetings</MenuItem>
             <MenuItem value="deep_work">🔵 Deep Work</MenuItem>
           </Select>

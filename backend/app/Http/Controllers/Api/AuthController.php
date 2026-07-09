@@ -35,7 +35,14 @@ class AuthController extends Controller
         $token = $user->createToken($request->device_name ?? 'api-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->roles->first()?->name,
+                'availability_status' => $user->availability_status,
+                'skills' => $user->skills,
+            ],
             'token' => $token,
         ]);
     }

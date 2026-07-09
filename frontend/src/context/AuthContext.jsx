@@ -35,6 +35,15 @@ export const AuthProvider = ({ children }) => {
     activeUserIdRef.current = user?.id;
   }, [user]);
 
+  const updateUserSession = useCallback((updatedFields) => {
+    setUser((prev) => {
+      if (!prev) return null;
+      const newUser = { ...prev, ...updatedFields };
+      localStorage.setItem('user_session', JSON.stringify(newUser));
+      return newUser;
+    });
+  }, []);
+
   const refreshCache = useCallback(async (showLoadingSpinner = false) => {
     if (!user) return;
     const fetchUserId = user.id;
@@ -72,6 +81,11 @@ export const AuthProvider = ({ children }) => {
       if (activeUserIdRef.current === fetchUserId) {
         setTasks(tasksRes.data);
         setEmployees(employeesRes.data);
+
+        const currentUserDetails = employeesRes.data.find(emp => emp.id === user.id);
+        if (currentUserDetails && currentUserDetails.availability_status !== user.availability_status) {
+          updateUserSession({ availability_status: currentUserDetails.availability_status });
+        }
       }
     } catch (err) {
       if (err.response && err.response.status === 401) {
@@ -87,7 +101,7 @@ export const AuthProvider = ({ children }) => {
         setEmployeesLoading(false);
       }
     }
-  }, [user]);
+  }, [user, updateUserSession]);
 
   const clearCache = useCallback((shouldSetLoading = false) => {
     setTasks([]);
@@ -183,6 +197,7 @@ export const AuthProvider = ({ children }) => {
         user,
         login,
         logout,
+        updateUserSession,
         switchRole,
         switchUser,
         searchQuery,
