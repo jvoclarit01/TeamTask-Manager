@@ -39,8 +39,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
       try {
         const res = await getEmployees();
         if (active) {
-          const adminUser = { id: 999, name: 'Admin', email: 'admin@company.com', role: 'admin' };
-          setSwitchableUsers([adminUser, ...res.data]);
+          setSwitchableUsers(res.data);
         }
       } catch (err) {
         console.error('Failed to load switchable users', err);
