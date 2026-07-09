@@ -1,36 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, CircularProgress } from '@mui/material';
-import { getMyTasks, updateTaskStatus } from '../services/apiService';
+import { updateTaskStatus } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import TaskCard from '../components/TaskCard';
 
 const EmployeeBoard = () => {
-  const { user, searchQuery, addNotification } = useAuth();
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { 
+    user, 
+    searchQuery, 
+    addNotification,
+    tasks,
+    tasksLoading,
+    refreshCache
+  } = useAuth();
+  
+  const loading = tasks.length === 0 && tasksLoading;
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    let active = true;
-    const loadMyTasks = async () => {
-      if (!user?.id) return;
-      try {
-        const res = await getMyTasks(user.id);
-        if (active) {
-          setTasks(res.data);
-        }
-      } catch (err) {
-        console.error('Failed to load employee tasks', err);
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    };
-    loadMyTasks();
-    return () => {
-      active = false;
-    };
+    if (user?.id) {
+      refreshCache(false); // background refresh
+    }
   }, [user, refreshKey]);
 
   const handleStatusChange = async (taskId, newStatus) => {
@@ -46,6 +36,7 @@ const EmployeeBoard = () => {
     try {
       await updateTaskStatus(taskId, newStatus);
       addNotification('Task Progress', `${user.name} moved task "${taskTitle}" to "${statusLabel}"`);
+      refreshCache(false);
       setRefreshKey((prev) => prev + 1);
     } catch (err) {
       console.error('Failed to transition task status', err);
