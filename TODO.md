@@ -6,6 +6,6 @@
 - [x] Task 4: Deactivation Safety Guard on Task Controller
 - [x] Task 5: Backend Security & Integration Tests
 - [x] Task 6: Frontend API Service Updates
-- [ ] Task 7: EmployeeBoard Status Selector
+- [x] Task 7: EmployeeBoard Status Selector
 - [ ] Task 8: AdminDashboard "Our Team" Panel
 - [ ] Task 9: Drag-and-Drop Task Rebalancing

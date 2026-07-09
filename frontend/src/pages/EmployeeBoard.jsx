@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, CircularProgress, IconButton, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Typography, Paper, CircularProgress, IconButton, useMediaQuery, useTheme, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ExpandLess from '@mui/icons-material/ExpandLess';
-import { updateTaskStatus } from '../services/apiService';
+import { updateTaskStatus, updateEmployeeStatus } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import TaskCard from '../components/TaskCard';
 
@@ -22,6 +22,25 @@ const EmployeeBoard = () => {
   const loading = tasks.length === 0 && tasksLoading;
   const [refreshKey, setRefreshKey] = useState(0);
   const [collapsedSections, setCollapsedSections] = useState({});
+  const [status, setStatus] = useState(user?.availability_status || 'active');
+
+  useEffect(() => {
+    if (user?.availability_status) {
+      setStatus(user.availability_status);
+    }
+  }, [user]);
+
+  const handleAvailabilityStatusChange = async (e) => {
+    const newStatus = e.target.value;
+    setStatus(newStatus);
+    try {
+      await updateEmployeeStatus(user.id, newStatus);
+      addNotification('Status Updated', `Your availability is now set to ${newStatus.toUpperCase()}`);
+      refreshCache(true);
+    } catch (err) {
+      console.error('Failed to update status', err);
+    }
+  };
 
   const toggleSection = (status) => {
     setCollapsedSections(prev => ({
@@ -88,9 +107,27 @@ const EmployeeBoard = () => {
 
   return (
     <Box sx={{ py: { xs: 1, sm: 2, md: 4 }, width: '100%' }}>
-      <Typography variant="h5" sx={{ mb: { xs: 2, md: 4 }, fontWeight: 'bold', color: '#f8fafc' }}>
-        Active Workload
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, md: 4 } }}>
+        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#f8fafc' }}>
+          Active Workload
+        </Typography>
+
+        <FormControl size="small" sx={{ minWidth: 150, background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+          <InputLabel id="availability-label" sx={{ color: '#94a3b8' }}>Status</InputLabel>
+          <Select
+            labelId="availability-label"
+            value={status}
+            label="Status"
+            onChange={handleAvailabilityStatusChange}
+            sx={{ color: '#f8fafc', '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.1)' } }}
+          >
+            <MenuItem value="active">🟢 Active</MenuItem>
+            <MenuItem value="ooo">🔴 On Leave</MenuItem>
+            <MenuItem value="in_meetings">🟡 In Meetings</MenuItem>
+            <MenuItem value="deep_work">🔵 Deep Work</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
       {/* Workload Metrics Row */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: { xs: 2, md: 3 }, mb: { xs: 2, md: 4 } }}>
