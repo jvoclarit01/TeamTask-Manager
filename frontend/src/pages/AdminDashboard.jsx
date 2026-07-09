@@ -177,6 +177,12 @@ const AdminDashboard = () => {
   const activePage = Math.min(page, Math.max(1, pageCount));
   const paginatedTasks = filteredTasks.slice((activePage - 1) * itemsPerPage, activePage * itemsPerPage);
 
+  const totalTasksCount = filteredTasks.length;
+  const completedCount = filteredTasks.filter(t => t.status === 'completed').length;
+  const inProgressCount = filteredTasks.filter(t => t.status === 'in_progress').length;
+  const pendingCount = filteredTasks.filter(t => t.status === 'pending').length;
+  const completionRate = totalTasksCount > 0 ? Math.round((completedCount / totalTasksCount) * 100) : 0;
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
@@ -214,6 +220,47 @@ const AdminDashboard = () => {
             Create Task
           </Button>
         </Box>
+      </Box>
+
+      {/* Workload Metrics Row */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3, mb: 4 }}>
+        {[
+          { label: 'Total Active Tasks', value: totalTasksCount, highlight: '#3b82f6' },
+          { label: 'Completion Rate', value: `${completionRate}%`, highlight: '#10b981' },
+          { label: 'In Progress Queue', value: inProgressCount, highlight: '#3b82f6' },
+          { label: 'Pending Assignment', value: pendingCount, highlight: '#f59e0b' }
+        ].map((stat, idx) => (
+          <Box
+            key={idx}
+            sx={{
+              background: '#0e1424',
+              border: '1px solid #1c253d',
+              borderRadius: '12px',
+              p: 2.5,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 0.5,
+              position: 'relative',
+              overflow: 'hidden',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: '4px',
+                background: stat.highlight
+              }
+            }}
+          >
+            <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 600, textTransform: 'uppercase' }}>
+              {stat.label}
+            </Typography>
+            <Typography variant="h4" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc' }}>
+              {stat.value}
+            </Typography>
+          </Box>
+        ))}
       </Box>
 
       {/* Main Task List View (Full-Width breathing room) */}
@@ -575,6 +622,26 @@ const AdminDashboard = () => {
               </Select>
             </FormControl>
 
+            {/* Priority Select */}
+            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ color: '#cbd5e1', mb: 1, fontWeight: 'bold' }}>
+                Priority Level
+              </Typography>
+              <Select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                sx={{
+                  background: '#0b0f19',
+                  color: '#f8fafc',
+                  '& fieldset': { borderColor: '#1c253d' },
+                }}
+              >
+                <MenuItem value="low">Low</MenuItem>
+                <MenuItem value="medium">Medium</MenuItem>
+                <MenuItem value="high">High</MenuItem>
+              </Select>
+            </FormControl>
+
             {/* Bottom Actions */}
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Button
@@ -765,6 +832,26 @@ const AdminDashboard = () => {
                     <ListItemText primary={employee.name} primaryTypographyProps={{ fontSize: '0.85rem' }} />
                   </MenuItem>
                 ))}
+              </Select>
+            </FormControl>
+
+            {/* Edit Priority Select */}
+            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ color: '#cbd5e1', mb: 1, fontWeight: 'bold' }}>
+                Priority Level
+              </Typography>
+              <Select
+                value={editPriority}
+                onChange={(e) => setEditPriority(e.target.value)}
+                sx={{
+                  background: '#0b0f19',
+                  color: '#f8fafc',
+                  '& fieldset': { borderColor: '#1c253d' },
+                }}
+              >
+                <MenuItem value="low">Low</MenuItem>
+                <MenuItem value="medium">Medium</MenuItem>
+                <MenuItem value="high">High</MenuItem>
               </Select>
             </FormControl>
 

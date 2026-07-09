@@ -68,6 +68,12 @@ const EmployeeBoard = () => {
     completed: filteredTasks.filter((t) => t.status === 'completed'),
   };
 
+  const empTotalTasks = filteredTasks.length;
+  const empCompleted = filteredTasks.filter(t => t.status === 'completed').length;
+  const empInProgress = filteredTasks.filter(t => t.status === 'in_progress').length;
+  const empPending = filteredTasks.filter(t => t.status === 'pending').length;
+  const empCompletionRate = empTotalTasks > 0 ? Math.round((empCompleted / empTotalTasks) * 100) : 0;
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
@@ -81,6 +87,47 @@ const EmployeeBoard = () => {
       <Typography variant="h5" sx={{ mb: 4, fontWeight: 'bold', color: '#f8fafc' }}>
         My Work Board
       </Typography>
+
+      {/* Workload Metrics Row */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3, mb: 4 }}>
+        {[
+          { label: 'My Total Tasks', value: empTotalTasks, highlight: '#3b82f6' },
+          { label: 'My Completion Rate', value: `${empCompletionRate}%`, highlight: '#10b981' },
+          { label: 'My Active Workload', value: empInProgress, highlight: '#3b82f6' },
+          { label: 'My Open Tasks', value: empPending, highlight: '#f59e0b' }
+        ].map((stat, idx) => (
+          <Box
+            key={idx}
+            sx={{
+              background: '#0e1424',
+              border: '1px solid #1c253d',
+              borderRadius: '12px',
+              p: 2.5,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 0.5,
+              position: 'relative',
+              overflow: 'hidden',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: '4px',
+                background: stat.highlight
+              }
+            }}
+          >
+            <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 600, textTransform: 'uppercase' }}>
+              {stat.label}
+            </Typography>
+            <Typography variant="h4" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc' }}>
+              {stat.value}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
 
       {/* CSS Grid layout sharing equal width, aligned to the far left */}
       <Box
