@@ -122,6 +122,21 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: '10px',
+          backgroundColor: '#0b0f19',
+          '& fieldset': {
+            borderColor: '#1c253d',
+            transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+          },
+          '&:hover fieldset': {
+            borderColor: '#2e3b5e !important',
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: '#10b981 !important',
+            borderWidth: '1px !important',
+          },
+          '&.Mui-focused': {
+            boxShadow: '0 0 12px rgba(16, 185, 129, 0.15)',
+          }
         },
       },
     },
