@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\http\JsonResponse;
-
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Enum;
+use App\Enums\AvailabilityStatus;
 
 class UserController extends Controller {
     public function index(Request $request): JsonResponse {
@@ -56,7 +57,7 @@ class UserController extends Controller {
         }
 
         $validated = $request->validate([
-            'availability_status' => ['required', new \Illuminate\Validation\Rules\Enum(\App\Enums\AvailabilityStatus::class)],
+            'availability_status' => ['required', new Enum(AvailabilityStatus::class)],
         ]);
 
         $user->availability_status = $validated['availability_status'];
@@ -77,6 +78,9 @@ class UserController extends Controller {
 
         if (isset($validated['is_active'])) {
             $user->is_active = $validated['is_active'];
+        }
+        if (isset($validated['is_active']) && !$validated['is_active']) {
+            $user->tokens()->delete();
         }
         if (isset($validated['skills'])) {
             $user->skills = $validated['skills'];

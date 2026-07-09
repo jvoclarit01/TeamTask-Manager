@@ -219,4 +219,31 @@ class SecurityTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_admin_deactivating_employee_revokes_tokens()
+    {
+        // Generate a token for employee1
+        $token = $this->employee1->createToken('test-token')->plainTextToken;
+
+        // Verify employee1 can access tasks using the token
+        $response = $this->withHeader('Authorization', "Bearer {$token}")
+            ->getJson('/api/tasks');
+        $response->assertStatus(200);
+
+        // Admin deactivates employee1
+        $adminResponse = $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/users/{$this->employee1->id}/admin-update", [
+                'is_active' => false,
+            ]);
+        $adminResponse->assertStatus(200);
+
+        // Clear actingAs authentication state
+        $this->app['auth']->forgetUser();
+        $this->app['auth']->guard('sanctum')->forgetUser();
+
+        // Verify employee1 can no longer access tasks using the old token (should return 401 unauthorized)
+        $response2 = $this->withHeader('Authorization', "Bearer {$token}")
+            ->getJson('/api/tasks');
+        $response2->assertStatus(401);
+    }
 }
