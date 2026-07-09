@@ -31,5 +31,5 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 # Expose port 80
 EXPOSE 80
 
-# Temporarily run migrate:fresh --seed on startup to wipe old users and seed only Admin and Yosh
-CMD php artisan migrate:fresh --seed --force && apache2-foreground
+# Automatically run migrations/seeders on startup, then start Apache
+CMD php artisan migrate --force && php artisan db:seed --force && apache2-foreground
