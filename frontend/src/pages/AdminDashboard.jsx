@@ -120,7 +120,7 @@ const AdminDashboard = () => {
         role: newUserRole,
       });
 
-      addNotification('User Created', `Successfully added teammate: "${newUserName}" (${newUserRole})`);
+      addNotification('User Created', `Successfully added new employee!: "${newUserName}" (${newUserRole})`);
       refreshCache(true); // force cache refresh to get new user list
 
       // Reset Form
@@ -134,7 +134,7 @@ const AdminDashboard = () => {
       if (err.response && err.response.data && err.response.data.message) {
         setAddUserError(err.response.data.message);
       } else {
-        setAddUserError('Failed to add teammate. Check your network or if the email is already registered.');
+        setAddUserError('Failed to add new employee. Check your network or if the email is already registered.');
       }
     } finally {
       setAddingUser(false);
@@ -273,7 +273,7 @@ const AdminDashboard = () => {
             onClick={() => setOpenAddUser(true)}
             sx={{ px: 2.5, py: 1, width: { xs: '100%', sm: 'auto' } }}
           >
-            Add Teammate
+            Add Employee
           </Button>
           <Button
             variant="contained"
@@ -969,7 +969,7 @@ const AdminDashboard = () => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: { xs: 2, sm: 4 } }}>
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc', letterSpacing: '-0.02em', fontSize: { xs: '1.1rem', sm: '1.25rem' }, lineHeight: 1.2 }}>
-                Add Teammate
+                Add Employee
               </Typography>
               <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600, display: 'block', mt: 0.5, fontSize: '0.75rem' }}>
                 Create a new user profile and assign their system role
