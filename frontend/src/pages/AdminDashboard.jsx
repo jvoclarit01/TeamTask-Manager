@@ -291,20 +291,9 @@ const AdminDashboard = () => {
           </Box>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Box
-              sx={{
-                maxHeight: '620px',
-                overflowY: 'auto',
-                pr: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-              }}
-            >
-              {paginatedTasks.map((task) => (
-                <TaskCard key={task.id} task={task} onEditClick={handleEditClick} />
-              ))}
-            </Box>
+            {paginatedTasks.map((task) => (
+              <TaskCard key={task.id} task={task} onEditClick={handleEditClick} />
+            ))}
 
             {/* Pagination Controls */}
             {pageCount > 1 && (

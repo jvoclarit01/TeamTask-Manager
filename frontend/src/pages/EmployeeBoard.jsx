@@ -197,6 +197,8 @@ const EmployeeBoard = () => {
                   sx={{ 
                     overflowY: 'auto', 
                     flexGrow: 1, 
+                    minHeight: 0, // Enforce flexbox scroll container boundaries
+                    height: 0,    // Force calculations based on parent Paper constraints
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
