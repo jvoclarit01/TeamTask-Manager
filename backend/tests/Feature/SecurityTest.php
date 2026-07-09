@@ -257,4 +257,39 @@ class SecurityTest extends TestCase
         $response->assertStatus(403)
             ->assertJson(['message' => 'You cannot deactivate your own account.']);
     }
+
+    public function test_cannot_assign_task_to_inactive_user_on_create()
+    {
+        $inactiveEmployee = User::factory()->inactive()->create([
+            'email' => 'inactive_assign@company.com',
+        ]);
+
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->postJson('/api/tasks', [
+                'title' => 'New Task',
+                'description' => 'Test',
+                'user_ids' => [$inactiveEmployee->id],
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['user_ids.0']);
+    }
+
+    public function test_cannot_assign_task_to_inactive_user_on_update()
+    {
+        $task = Task::create(['title' => 'Existing Task', 'status' => 'pending', 'priority' => 'medium']);
+        $task->users()->sync([$this->employee1->id]);
+
+        $inactiveEmployee = User::factory()->inactive()->create([
+            'email' => 'inactive_assign2@company.com',
+        ]);
+
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/tasks/{$task->id}", [
+                'user_ids' => [$inactiveEmployee->id],
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['user_ids.0']);
+    }
 }

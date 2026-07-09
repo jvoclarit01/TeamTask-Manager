@@ -4,6 +4,7 @@ namespace App\Http\Requests\Api;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTaskRequest extends FormRequest
 {
@@ -27,7 +28,9 @@ class StoreTaskRequest extends FormRequest
             'description' => 'nullable|string',
             'due_date'    => 'nullable|date',
             'user_ids'    => 'required|array|min:1',
-            'user_ids.*'  => 'exists:users,id',
+            'user_ids.*'  => [
+                Rule::exists('users', 'id')->where('is_active', true)
+            ],
             'priority'    => 'nullable|in:low,medium,high',
         ];
     }

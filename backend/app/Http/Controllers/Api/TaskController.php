@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Api\StoreTaskRequest;
+use Illuminate\Validation\Rule;
 
 class TaskController extends Controller
 {
@@ -66,7 +67,9 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'due_date'    => 'nullable|date',
             'user_ids'    => 'sometimes|array|min:1',
-            'user_ids.*'  => 'exists:users,id',
+            'user_ids.*'  => [
+                Rule::exists('users', 'id')->where('is_active', true)
+            ],
             'priority'    => 'nullable|in:low,medium,high',
             'status'      => 'nullable|in:pending,in_progress,completed',
         ]);
