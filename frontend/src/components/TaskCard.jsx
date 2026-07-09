@@ -92,6 +92,7 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
         border: '1px solid #2e3b5e',
         borderRadius: '16px', // rounded-xl
         boxShadow: 'none',
+        flexShrink: 0, // Prevent cards from shrinking/compressing inside scrollable columns
         transition: 'all 0.2s ease',
         '&:hover': {
           borderColor: 'rgba(16, 185, 129, 0.3)',
