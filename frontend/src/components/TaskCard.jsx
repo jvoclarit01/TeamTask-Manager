@@ -1,8 +1,12 @@
-import { Card, CardContent, Typography, Box, Chip, Avatar, Tooltip, Button, AvatarGroup, IconButton } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, Typography, Box, Chip, Avatar, Tooltip, Button, AvatarGroup, IconButton, Drawer, Divider, TextField, CircularProgress, List, ListItem } from '@mui/material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import EditIcon from '@mui/icons-material/Edit';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutlined';
+import CloseIcon from '@mui/icons-material/Close';
 import { useAuth } from '../context/AuthContext';
 import SynergyLogo from './SynergyLogo';
+import { getComments, addComment } from '../services/apiService';
 
 const statusColors = {
   pending: { label: 'Pending', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
@@ -15,6 +19,64 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
   const isAdmin = currentUser?.role === 'admin';
   const currentStatus = statusColors[task.status] || { label: task.status, color: '#cbd5e1', bg: 'rgba(203, 213, 225, 0.1)' };
   const hasDescription = !!task.description && task.description.trim() !== '';
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [loadingComments, setLoadingComments] = useState(false);
+
+  useEffect(() => {
+    if (drawerOpen) {
+      const fetchComments = async () => {
+        setLoadingComments(true);
+        try {
+          const res = await getComments(task.id);
+          setComments(res.data);
+        } catch (err) {
+          console.error('Failed to load comments', err);
+        } finally {
+          setLoadingComments(false);
+        }
+      };
+      fetchComments();
+    }
+  }, [drawerOpen, task.id]);
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+
+    try {
+      const res = await addComment(task.id, {
+        user_id: currentUser.id,
+        content: newComment
+      });
+      setComments((prev) => [...prev, res.data]);
+      setNewComment('');
+    } catch (err) {
+      console.error('Failed to add comment', err);
+    }
+  };
+
+  const priorityStyles = {
+    high: {
+      bgcolor: 'rgba(239, 68, 68, 0.05)',
+      color: '#ef4444',
+      border: '1px solid rgba(239, 68, 68, 0.2)',
+    },
+    medium: {
+      bgcolor: 'rgba(245, 158, 11, 0.05)',
+      color: '#f59e0b',
+      border: '1px solid rgba(245, 158, 11, 0.2)',
+    },
+    low: {
+      bgcolor: 'rgba(59, 130, 246, 0.05)',
+      color: '#3b82f6',
+      border: '1px solid rgba(59, 130, 246, 0.2)',
+    }
+  };
+
+  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'completed';
 
   const formattedDeadline = task.due_date ? new Date(task.due_date).toLocaleDateString('en-US', {
     month: 'short',
@@ -62,20 +124,46 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
               )}
             </Box>
           </Box>
-          <Chip
-            label={currentStatus.label}
-            size="small"
-            sx={{
-              bgcolor: currentStatus.bg,
-              color: currentStatus.color,
-              fontWeight: 600,
-              fontSize: '0.75rem',
-              borderRadius: '20px',
-              border: 'none',
-              px: 1,
-              flexShrink: 0
-            }}
-          />
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            {isOverdue && (
+              <Chip
+                label="⚠️ Overdue"
+                size="small"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: '0.7rem',
+                  bgcolor: 'rgba(239, 68, 68, 0.1)',
+                  color: '#ef4444',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                }}
+              />
+            )}
+            <Chip
+              label={task.priority ? task.priority.toUpperCase() : 'MEDIUM'}
+              size="small"
+              sx={{
+                fontWeight: 700,
+                fontSize: '0.7rem',
+                borderRadius: '20px',
+                px: 0.5,
+                ...priorityStyles[task.priority || 'medium']
+              }}
+            />
+            <Chip
+              label={currentStatus.label}
+              size="small"
+              sx={{
+                bgcolor: currentStatus.bg,
+                color: currentStatus.color,
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                borderRadius: '20px',
+                border: 'none',
+                px: 1,
+                flexShrink: 0
+              }}
+            />
+          </Box>
         </Box>
 
         {/* Description (Always fully visible) */}
@@ -111,6 +199,15 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
 
           {/* Right Side: Action Buttons for Employees or Deadline */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {/* Comments Icon Button Trigger */}
+            <IconButton
+              size="small"
+              onClick={() => setDrawerOpen(true)}
+              sx={{ color: '#cbd5e1', mr: 2, '&:hover': { color: '#10b981', bgcolor: 'rgba(255,255,255,0.05)' } }}
+            >
+              <ChatBubbleOutlineIcon sx={{ fontSize: '1.1rem' }} />
+            </IconButton>
+
             {isEmployeeView && task.status !== 'completed' ? (
               <Box>
                 {task.status === 'pending' && (
@@ -147,7 +244,147 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
           </Box>
         </Box>
       </CardContent>
+
+      {/* Comments & Task Details Slide-out Drawer */}
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        PaperProps={{
+          sx: {
+            width: { xs: '100%', sm: '420px' },
+            background: '#090d16',
+            borderLeft: '1px solid #141b2d',
+            p: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '100%'
+          }
+        }}
+      >
+        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          {/* Header */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <SynergyLogo size={20} />
+              <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: '"Outfit", sans-serif', color: '#f8fafc' }}>
+                Task Details
+              </Typography>
+            </Box>
+            <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: '#94a3b8' }}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          <Divider sx={{ mb: 3, borderColor: '#141b2d' }} />
+
+          {/* Details Body */}
+          <Box sx={{ overflowY: 'auto', flexGrow: 1, pr: 1 }}>
+            <Typography variant="caption" sx={{ color: '#94a3b8', fontFamily: '"Fira Code", monospace', fontWeight: 'bold' }}>
+              TSK-{task.id}
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: '#f8fafc', mt: 0.5, mb: 2, fontFamily: '"Outfit", sans-serif' }}>
+              {task.title}
+            </Typography>
+
+            <Box sx={{ display: 'flex', gap: 1, mb: 3, flexWrap: 'wrap' }}>
+              {isOverdue && <Chip label="⚠️ Overdue" color="error" size="small" />}
+              <Chip label={task.priority ? task.priority.toUpperCase() : 'MEDIUM'} size="small" sx={{ ...priorityStyles[task.priority || 'medium'] }} />
+              <Chip label={currentStatus.label} size="small" sx={{ bgcolor: currentStatus.bg, color: currentStatus.color }} />
+            </Box>
+
+            <Typography variant="body2" sx={{ color: '#cbd5e1', lineHeight: 1.6, mb: 4 }}>
+              {task.description || 'No description provided.'}
+            </Typography>
+
+            <Divider sx={{ mb: 3, borderColor: '#141b2d' }} />
+
+            {/* Comments Thread Section */}
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#f8fafc', mb: 2, fontFamily: '"Outfit", sans-serif' }}>
+              Comments & Updates
+            </Typography>
+
+            {loadingComments ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                <CircularProgress size={24} />
+              </Box>
+            ) : comments.length === 0 ? (
+              <Typography variant="body2" sx={{ color: '#475569', fontStyle: 'italic', py: 2 }}>
+                No updates or comments yet.
+              </Typography>
+            ) : (
+              <List disablePadding>
+                {comments.map((comment) => (
+                  <ListItem
+                    key={comment.id}
+                    disablePadding
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 2,
+                      mb: 2.5,
+                      p: 1.5,
+                      borderRadius: '8px',
+                      background: 'rgba(255,255,255,0.01)',
+                      border: '1px solid rgba(255,255,255,0.02)'
+                    }}
+                  >
+                    <Avatar sx={{ bgcolor: '#3b82f6', width: 28, height: 28, fontSize: '0.75rem', fontWeight: 'bold' }}>
+                      {comment.user?.name.charAt(0)}
+                    </Avatar>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#cbd5e1', fontSize: '0.8rem' }}>
+                          {comment.user?.name}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#475569', fontSize: '0.65rem' }}>
+                          {new Date(comment.created_at).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" sx={{ color: '#f8fafc', fontSize: '0.8rem', lineHeight: 1.5 }}>
+                        {comment.content}
+                      </Typography>
+                    </Box>
+                  </ListItem>
+                ))}
+              </List>
+            )}
+          </Box>
+        </Box>
+
+        {/* Post Comment Form */}
+        <Box component="form" onSubmit={handleCommentSubmit} sx={{ pt: 2, borderTop: '1px solid #141b2d', background: '#090d16' }}>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Post an update or comment..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            sx={{
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'rgba(255,255,255,0.01)',
+                '& fieldset': { borderColor: '#141b2d' },
+                '&:hover fieldset': { borderColor: '#1e293b' },
+              },
+              input: { color: '#f8fafc', fontSize: '0.85rem' }
+            }}
+          />
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            type="submit"
+            disabled={!newComment.trim()}
+            sx={{ height: '36px' }}
+          >
+            Post Comment
+          </Button>
+        </Box>
+      </Drawer>
     </Card>
+
   );
 };
 
