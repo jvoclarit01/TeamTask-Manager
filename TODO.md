@@ -5,7 +5,7 @@
 - [x] Task 3: API Endpoints for User Update & Retrieval
 - [x] Task 4: Deactivation Safety Guard on Task Controller
 - [x] Task 5: Backend Security & Integration Tests
-- [ ] Task 6: Frontend API Service Updates
+- [x] Task 6: Frontend API Service Updates
 - [ ] Task 7: EmployeeBoard Status Selector
 - [ ] Task 8: AdminDashboard "Our Team" Panel
 - [ ] Task 9: Drag-and-Drop Task Rebalancing

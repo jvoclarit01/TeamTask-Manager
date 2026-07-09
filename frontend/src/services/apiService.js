@@ -54,4 +54,10 @@ export const addComment = (taskId, commentData) => {
   return api.post(`/tasks/${taskId}/comments`, commentData);
 };
 
+// Update employee availability status (Self)
+export const updateEmployeeStatus = (userId, status) => api.patch(`/users/${userId}/status`, { availability_status: status });
+
+// Admin update employee details (active status, skills)
+export const adminUpdateEmployee = (userId, data) => api.put(`/users/${userId}/admin-update`, data);
+
 export default api;
