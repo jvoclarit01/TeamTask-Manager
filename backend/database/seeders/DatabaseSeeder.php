@@ -24,34 +24,9 @@ class DatabaseSeeder extends Seeder
         $admin = User::firstOrCreate([
             'email' => 'admin@company.com',
         ], [
-            'name' => 'Alice Admin',
+            'name' => 'Admin',
             'password' => bcrypt('password123'),
         ]);
         $admin->assignRole($adminRole);
-
-        // 3. Create Employee Users
-        $employee1 = User::firstOrCreate([
-            'email' => 'bob@company.com',
-        ], [
-            'name' => 'Bob Employee',
-            'password' => bcrypt('password123'),
-        ]);
-        $employee1->assignRole($employeeRole);
-
-        $employee2 = User::firstOrCreate([
-            'email' => 'charlie@company.com',
-        ], [
-            'name' => 'Charlie Employee',
-            'password' => bcrypt('password123'),
-        ]);
-        $employee2->assignRole($employeeRole);
-
-        $employee3 = User::firstOrCreate([
-            'email' => 'diana@company.com',
-        ], [
-            'name' => 'Diana Employee',
-            'password' => bcrypt('password123'),
-        ]);
-        $employee3->assignRole($employeeRole);
     }
 }
