@@ -23,7 +23,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [switchableUsers, setSwitchableUsers] = useState([]);
-  const [showWelcome, setShowWelcome] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(Boolean(user));
 
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
 
@@ -47,12 +47,6 @@ const SidebarAndHeaderLayout = ({ children }) => {
       active = false;
     };
   }, [user]);
-
-  useEffect(() => {
-    if (user && switchableUsers.length === 0) {
-      setShowWelcome(true);
-    }
-  }, [user, switchableUsers]);
 
   if (!user) return <Box sx={{ width: '100%' }}>{children}</Box>;
 
