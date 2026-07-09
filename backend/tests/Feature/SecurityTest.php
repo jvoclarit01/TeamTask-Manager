@@ -101,4 +101,33 @@ class SecurityTest extends TestCase
             'content' => 'Spoofed message'
         ]);
     }
+
+    public function test_active_user_can_login()
+    {
+        $response = $this->postJson('/api/login', [
+            'email' => 'bob@company.com',
+            'password' => 'password',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['user', 'token']);
+    }
+
+    public function test_inactive_user_cannot_login()
+    {
+        $inactiveEmployee = User::factory()->inactive()->create([
+            'email' => 'inactive@company.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'email' => 'inactive@company.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(403)
+            ->assertJson([
+                'message' => 'Your account has been deactivated. Please contact an admin.'
+            ]);
+    }
 }

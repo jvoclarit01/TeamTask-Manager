@@ -26,6 +26,12 @@ class AuthController extends Controller
             ]);
         }
 
+        if (! $user->is_active) {
+            return response()->json([
+                'message' => 'Your account has been deactivated. Please contact an admin.'
+            ], 403);
+        }
+
         $token = $user->createToken($request->device_name ?? 'api-token')->plainTextToken;
 
         return response()->json([
