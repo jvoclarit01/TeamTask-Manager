@@ -58,7 +58,8 @@ const EmployeeBoard = () => {
     const matchesTitle = task.title.toLowerCase().includes(query);
     const matchesDescription = task.description ? task.description.toLowerCase().includes(query) : false;
     const matchesEmployee = task.users ? task.users.some((user) => user.name.toLowerCase().includes(query)) : false;
-    return matchesTitle || matchesDescription || matchesEmployee;
+    const matchesId = `tsk-${task.id}`.includes(query) || `tsk${task.id}`.includes(query) || task.id.toString() === query;
+    return matchesTitle || matchesDescription || matchesEmployee || matchesId;
   });
 
   const tasksByStatus = {
