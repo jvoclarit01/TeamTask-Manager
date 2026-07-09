@@ -69,7 +69,7 @@ const SidebarAndHeaderLayout = ({ children }) => {
   const handleUserSwitch = (selectedUser) => {
     switchUser(selectedUser);
     handleMenuClose();
-    setShowWelcome(true);
+    // Do not show full-screen welcome overlay on quick user switching to prevent 1.8s load delay
     const isSelAdmin = selectedUser.name.includes('Admin') || selectedUser.role === 'admin';
     if (isSelAdmin) {
       navigate('/admin/dashboard');

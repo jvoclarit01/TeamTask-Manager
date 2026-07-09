@@ -109,7 +109,22 @@ export const AuthProvider = ({ children }) => {
 
   const switchRole = (newRole) => {
     clearCache();
-    const newUser = newRole === 'admin' ? DEFAULT_ADMIN : DEFAULT_EMPLOYEE;
+    let newUser;
+    if (newRole === 'admin') {
+      newUser = DEFAULT_ADMIN;
+    } else {
+      const lastEmp = localStorage.getItem('last_employee_session');
+      if (lastEmp) {
+        try {
+          newUser = JSON.parse(lastEmp);
+        } catch (e) {
+          console.error('Failed to parse last employee session:', e);
+          newUser = DEFAULT_EMPLOYEE;
+        }
+      } else {
+        newUser = DEFAULT_EMPLOYEE;
+      }
+    }
     setUser(newUser);
     localStorage.setItem('user_session', JSON.stringify(newUser));
   };
@@ -125,6 +140,9 @@ export const AuthProvider = ({ children }) => {
     };
     setUser(sessionUser);
     localStorage.setItem('user_session', JSON.stringify(sessionUser));
+    if (!isSelAdmin) {
+      localStorage.setItem('last_employee_session', JSON.stringify(sessionUser));
+    }
   };
 
   return (
