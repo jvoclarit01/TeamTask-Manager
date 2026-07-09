@@ -67,6 +67,7 @@ const AdminDashboard = () => {
   const [skillPopoverAnchor, setSkillPopoverAnchor] = useState(null);
   const [selectedEmployeeForSkill, setSelectedEmployeeForSkill] = useState(null);
   const [newSkillInput, setNewSkillInput] = useState('');
+  const [dragOverEmpId, setDragOverEmpId] = useState(null);
 
   const handleToggleActive = async (emp) => {
     if (emp.is_active) {
@@ -531,14 +532,39 @@ const AdminDashboard = () => {
               return (
                 <Box
                   key={emp.id}
+                  onDragOver={(e) => {
+                    if (emp.is_active) {
+                      e.preventDefault();
+                      setDragOverEmpId(emp.id);
+                    }
+                  }}
+                  onDragLeave={() => {
+                    setDragOverEmpId(null);
+                  }}
+                  onDrop={async (e) => {
+                    e.preventDefault();
+                    setDragOverEmpId(null);
+                    const taskId = e.dataTransfer.getData('text/plain');
+                    if (!taskId) return;
+                    
+                    try {
+                      await updateTask(Number(taskId), {
+                        user_ids: [emp.id]
+                      });
+                      addNotification('Task Reassigned', `Task rebalanced and assigned to ${emp.name}`);
+                      refreshCache(true);
+                    } catch (err) {
+                      console.error('Failed to rebalance task', err);
+                    }
+                  }}
                   sx={{
                     p: 2.5,
                     mb: 2.5,
-                    background: 'rgba(255, 255, 255, 0.01)',
-                    border: '1px solid rgba(255, 255, 255, 0.03)',
+                    background: dragOverEmpId === emp.id ? 'rgba(16, 185, 129, 0.08)' : 'rgba(255, 255, 255, 0.01)',
+                    border: dragOverEmpId === emp.id ? '1px dashed #10b981' : '1px solid rgba(255, 255, 255, 0.03)',
                     borderRadius: '12px',
                     opacity: emp.is_active ? 1 : 0.55,
-                    transition: 'opacity 0.2s ease',
+                    transition: 'all 0.2s ease',
                     '&:last-child': { mb: 0 }
                   }}
                 >

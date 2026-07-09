@@ -8,4 +8,4 @@
 - [x] Task 6: Frontend API Service Updates
 - [x] Task 7: EmployeeBoard Status Selector
 - [x] Task 8: AdminDashboard "Our Team" Panel
-- [ ] Task 9: Drag-and-Drop Task Rebalancing
+- [x] Task 9: Drag-and-Drop Task Rebalancing

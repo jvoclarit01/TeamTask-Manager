@@ -86,6 +86,11 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
 
   return (
     <Card 
+      draggable={isAdmin}
+      onDragStart={(e) => {
+        if (!isAdmin) return;
+        e.dataTransfer.setData('text/plain', task.id);
+      }}
       sx={{ 
         mb: 2, 
         background: '#1e293b', // Elevated task cards #1E293B
@@ -94,6 +99,10 @@ const TaskCard = ({ task, isEmployeeView, onStatusChange, onEditClick }) => {
         boxShadow: 'none',
         flexShrink: 0, // Prevent cards from shrinking/compressing inside scrollable columns
         transition: 'all 0.2s ease',
+        cursor: isAdmin ? 'grab' : 'default',
+        '&:active': {
+          cursor: isAdmin ? 'grabbing' : 'default'
+        },
         '&:hover': {
           borderColor: 'rgba(16, 185, 129, 0.3)',
           transform: 'translateY(-2px)'
