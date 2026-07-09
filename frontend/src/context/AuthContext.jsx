@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
 import { getTasks, getEmployees, getMyTasks } from '../services/apiService';
 
 const AuthContext = createContext(null);
@@ -26,8 +26,15 @@ export const AuthProvider = ({ children }) => {
   const [tasksLoading, setTasksLoading] = useState(false);
   const [employeesLoading, setEmployeesLoading] = useState(false);
 
+  const activeUserIdRef = useRef(user?.id);
+
+  useEffect(() => {
+    activeUserIdRef.current = user?.id;
+  }, [user]);
+
   const refreshCache = useCallback(async (showLoadingSpinner = false) => {
     if (!user) return;
+    const fetchUserId = user.id;
     
     if (showLoadingSpinner) {
       setTasksLoading(true);
@@ -45,13 +52,17 @@ export const AuthProvider = ({ children }) => {
         getEmployees()
       ]);
       
-      setTasks(tasksRes.data);
-      setEmployees(employeesRes.data);
+      if (activeUserIdRef.current === fetchUserId) {
+        setTasks(tasksRes.data);
+        setEmployees(employeesRes.data);
+      }
     } catch (err) {
       console.error('Failed to update dashboard cache', err);
     } finally {
-      setTasksLoading(false);
-      setEmployeesLoading(false);
+      if (activeUserIdRef.current === fetchUserId) {
+        setTasksLoading(false);
+        setEmployeesLoading(false);
+      }
     }
   }, [user]);
 
