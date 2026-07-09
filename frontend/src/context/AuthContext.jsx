@@ -1,9 +1,9 @@
 import { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
-import { getTasks, getEmployees, getMyTasks } from '../services/apiService';
+import { getTasks, getEmployees, getMyTasks, login as apiLogin, setAuthToken } from '../services/apiService';
 
 const AuthContext = createContext(null);
 
-const DEFAULT_ADMIN = { id: 999, name: 'Alice Admin', email: 'admin@company.com', role: 'admin' };
+const DEFAULT_ADMIN = { id: 2, name: 'Alice Admin', email: 'admin@company.com', role: 'admin' };
 const DEFAULT_EMPLOYEE = { id: 3, name: 'Bob Employee', email: 'bob@company.com', role: 'employee' };
 
 export const AuthProvider = ({ children }) => {
@@ -11,7 +11,10 @@ export const AuthProvider = ({ children }) => {
     const savedUser = localStorage.getItem('user_session');
     if (savedUser) {
       try {
-        return JSON.parse(savedUser);
+        const parsed = JSON.parse(savedUser);
+        if (parsed && parsed.name) {
+          return parsed;
+        }
       } catch (error) {
         console.error('Error parsing user session from localStorage:', error);
       }
@@ -42,6 +45,20 @@ export const AuthProvider = ({ children }) => {
     }
     
     try {
+      // 1. Retrieve or fetch token from local cache map to avoid network login roundtrip
+      const cachedTokens = JSON.parse(localStorage.getItem('user_tokens') || '{}');
+      let token = cachedTokens[user.id];
+      
+      if (!token) {
+        const loginRes = await apiLogin({ email: user.email, password: 'password123' });
+        token = loginRes.data.token;
+        cachedTokens[user.id] = token;
+        localStorage.setItem('user_tokens', JSON.stringify(cachedTokens));
+      }
+      
+      setAuthToken(token);
+      localStorage.setItem('last_authenticated_user_id', String(user.id));
+
       // Concurrently fetch tasks and employees
       const tasksPromise = user.role === 'admin' 
         ? getTasks() 
@@ -57,6 +74,12 @@ export const AuthProvider = ({ children }) => {
         setEmployees(employeesRes.data);
       }
     } catch (err) {
+      if (err.response && err.response.status === 401) {
+        const cachedTokens = JSON.parse(localStorage.getItem('user_tokens') || '{}');
+        delete cachedTokens[user.id];
+        localStorage.setItem('user_tokens', JSON.stringify(cachedTokens));
+        localStorage.removeItem('last_authenticated_user_id');
+      }
       console.error('Failed to update dashboard cache', err);
     } finally {
       if (activeUserIdRef.current === fetchUserId) {
@@ -116,6 +139,8 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user_session');
+    localStorage.removeItem('user_tokens');
+    localStorage.removeItem('last_authenticated_user_id');
   };
 
   const switchRole = (newRole) => {

@@ -9,6 +9,33 @@ const api = axios.create({
   },
 });
 
+// Token management
+let authToken = localStorage.getItem('api_token') || null;
+
+export const setAuthToken = (token) => {
+  authToken = token;
+  if (token) {
+    localStorage.setItem('api_token', token);
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    localStorage.removeItem('api_token');
+    delete api.defaults.headers.common['Authorization'];
+  }
+};
+
+export const clearAuthToken = () => setAuthToken(null);
+
+// Initialize token on load
+if (authToken) {
+  api.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+}
+
+// Auth endpoints
+export const login = (credentials) => api.post('/login', credentials);
+export const logout = () => api.post('/logout');
+export const getCurrentUser = () => api.get('/user');
+
+// Task endpoints
 export const getEmployees = () => api.get('/users');
 export const getTasks = () => api.get('/tasks');
 export const createTask = (taskData) => api.post('/tasks', taskData);
@@ -17,6 +44,7 @@ export const updateTaskStatus = (taskId, status) => api.patch(`/tasks/${taskId}`
 export const getMyTasks = (userId) => api.get(`/users/${userId}/tasks`);
 export const deleteTask = (taskId) => api.delete(`/tasks/${taskId}`);
 
+// Comment endpoints
 export const getComments = (taskId) => {
   return api.get(`/tasks/${taskId}/comments`);
 };

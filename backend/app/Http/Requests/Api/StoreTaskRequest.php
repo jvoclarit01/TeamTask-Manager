@@ -23,10 +23,12 @@ class StoreTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
+            'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
-            'user_ids' => 'required|array',
-            'user_ids.*' => 'exists:users,id',
+            'due_date'    => 'nullable|date',
+            'user_ids'    => 'required|array|min:1',
+            'user_ids.*'  => 'exists:users,id',
+            'priority'    => 'nullable|in:low,medium,high',
         ];
     }
 }
