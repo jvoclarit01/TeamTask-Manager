@@ -4,18 +4,27 @@ import AddIcon from '@mui/icons-material/Add';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import CloseIcon from '@mui/icons-material/Close';
-import { getEmployees, getTasks, createTask, updateTask } from '../services/apiService';
+import { createTask, updateTask } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import TaskCard from '../components/TaskCard';
 
 const AdminDashboard = () => {
-  const { searchQuery, addNotification } = useAuth();
-  const [tasks, setTasks] = useState([]);
-  const [employees, setEmployees] = useState([]);
+  const { 
+    searchQuery, 
+    addNotification,
+    tasks,
+    employees,
+    tasksLoading,
+    employeesLoading,
+    refreshCache 
+  } = useAuth();
+  
+  // Calculate dynamic loading state
+  const loading = (tasks.length === 0 && tasksLoading) || (employees.length === 0 && employeesLoading);
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [assignedUserIds, setAssignedUserIds] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
   const [open, setOpen] = useState(false);
   const [dueDate, setDueDate] = useState('');
@@ -38,26 +47,7 @@ const AdminDashboard = () => {
   const itemsPerPage = 3; // Setting to 3 to easily demonstrate page switching
 
   useEffect(() => {
-    let active = true;
-    const loadData = async () => {
-      try {
-        const [tasksRes, employeesRes] = await Promise.all([getTasks(), getEmployees()]);
-        if (active) {
-          setTasks(tasksRes.data);
-          setEmployees(employeesRes.data);
-        }
-      } catch (err) {
-        console.error('Failed to load Admin workload data', err);
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    };
-    loadData();
-    return () => {
-      active = false;
-    };
+    refreshCache(false); // background refresh
   }, [refreshKey]);
 
   const handleSubmit = async (e) => {
@@ -73,6 +63,7 @@ const AdminDashboard = () => {
         priority,
       });
       addNotification('Task Created', `Admin assigned a new task: "${title}"`);
+      refreshCache(false);
       setTitle('');
       setDescription('');
       setDueDate('');
@@ -117,6 +108,7 @@ const AdminDashboard = () => {
         priority: editPriority,
       });
       addNotification('Task Updated', `Admin updated task details: "${editTitle}"`);
+      refreshCache(false);
       setEditingTask(null);
       setRefreshKey((prev) => prev + 1);
     } catch (err) {
