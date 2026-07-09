@@ -108,11 +108,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user, refreshCache, clearCache]);
 
-  const [notifications, setNotifications] = useState([
-    { id: 1, title: 'Task Created', message: 'Alice Admin created task: Redesign logo', time: 'Just now', read: false },
-    { id: 2, title: 'Task Started', message: 'Bob Employee started task: update backend', time: '10 mins ago', read: false },
-    { id: 3, title: 'Task Completed', message: 'Charlie Employee completed task: Update UI Components', time: '1 hr ago', read: true },
-  ]);
+  const [notifications, setNotifications] = useState([]);
 
   const addNotification = (title, message) => {
     setNotifications((prev) => [
