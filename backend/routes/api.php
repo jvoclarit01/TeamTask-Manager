@@ -14,12 +14,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Employee list (For the assignment dropdown)
     Route::get('/users',  [UserController::class, 'index']);
+    Route::patch('/users/{user}/status', [UserController::class, 'updateStatus']);
 
     // Tasks (Admin-only creation & deletion)
     Route::middleware('role:admin')->group(function () {
         Route::post('/tasks', [TaskController::class, 'store']);
         Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
         Route::post('/users', [UserController::class, 'store']);
+        Route::put('/users/{user}/admin-update', [UserController::class, 'adminUpdate']);
     });
 
     // Task actions available to authenticated users (individual logic handled in controller)

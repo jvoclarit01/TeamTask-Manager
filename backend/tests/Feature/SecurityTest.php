@@ -130,4 +130,93 @@ class SecurityTest extends TestCase
                 'message' => 'Your account has been deactivated. Please contact an admin.'
             ]);
     }
+
+    public function test_employee_can_only_see_active_employees_in_list()
+    {
+        // Deactivate employee2
+        $this->employee2->is_active = false;
+        $this->employee2->save();
+
+        $response = $this->actingAs($this->employee1, 'sanctum')
+            ->getJson('/api/users');
+
+        $response->assertStatus(200);
+        // Should see employee1 but not employee2
+        $response->assertJsonFragment(['id' => $this->employee1->id]);
+        $response->assertJsonMissing(['id' => $this->employee2->id]);
+    }
+
+    public function test_admin_can_see_inactive_employees_in_list()
+    {
+        // Deactivate employee2
+        $this->employee2->is_active = false;
+        $this->employee2->save();
+
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/users');
+
+        $response->assertStatus(200);
+        // Admin should see both employee1 and employee2
+        $response->assertJsonFragment(['id' => $this->employee1->id]);
+        $response->assertJsonFragment(['id' => $this->employee2->id]);
+    }
+
+    public function test_employee_can_update_own_status()
+    {
+        $response = $this->actingAs($this->employee1, 'sanctum')
+            ->patchJson("/api/users/{$this->employee1->id}/status", [
+                'availability_status' => 'deep_work',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'Status updated successfully',
+                'availability_status' => 'deep_work',
+            ]);
+
+        $this->assertEquals(\App\Enums\AvailabilityStatus::DEEP_WORK, $this->employee1->fresh()->availability_status);
+    }
+
+    public function test_employee_cannot_update_others_status()
+    {
+        $response = $this->actingAs($this->employee1, 'sanctum')
+            ->patchJson("/api/users/{$this->employee2->id}/status", [
+                'availability_status' => 'ooo',
+            ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_update_employee_active_status_and_skills()
+    {
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/users/{$this->employee1->id}/admin-update", [
+                'is_active' => false,
+                'skills' => ['Backend', 'Laravel'],
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'Employee details updated successfully',
+                'user' => [
+                    'id' => $this->employee1->id,
+                    'is_active' => false,
+                    'skills' => ['Backend', 'Laravel'],
+                ]
+            ]);
+
+        $fresh = $this->employee1->fresh();
+        $this->assertFalse($fresh->is_active);
+        $this->assertEquals(['Backend', 'Laravel'], $fresh->skills);
+    }
+
+    public function test_non_admin_cannot_update_employee_details()
+    {
+        $response = $this->actingAs($this->employee1, 'sanctum')
+            ->putJson("/api/users/{$this->employee2->id}/admin-update", [
+                'is_active' => false,
+            ]);
+
+        $response->assertStatus(403);
+    }
 }
