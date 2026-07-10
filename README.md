@@ -18,14 +18,16 @@ Synergy HRMS is a modern, premium Team Task and Workload Management application 
 ## 🛠️ Technology Stack
 
 ### Backend
-* **Core:** Laravel 11/12
+* **Core:** Laravel 13.x (Clean MVC structure enforcing [gemini.md](file:///D:/TeamTask/gemini.md) guidelines)
+* **Architecture:** Form Request validation layers (Fast-Fail validation early abort) keeping controllers thin
 * **Authentication:** Laravel Sanctum (Token-based)
 * **Access Control:** Spatie Laravel-Permission (Role boundaries)
-* **Database:** SQLite / MySQL (Transactional queries)
+* **Database:** MySQL / SQLite (Transactional integrity)
 
 ### Frontend
-* **Core:** React 18 (Vite template)
-* **Styling:** TailwindCSS & Custom Glassmorphic CSS variables
+* **Core:** React 18 (Vite template, dynamic lazy-loading)
+* **State Management:** Context API with SWR caching, session memory mapping, and `cachedUserId` session boundary guards
+* **Styling:** Material UI (MUI), TailwindCSS & Custom Glassmorphic CSS variables
 * **API Client:** Axios (Custom header token injects)
 
 ---

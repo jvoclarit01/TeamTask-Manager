@@ -100,3 +100,45 @@ Key metrics added include:
   * **Auto-Detachment**: Deactivating a user detaches them from all incomplete tasks.
   * **Schema Performance**: Added DB indexes for `is_active` and `availability_status` columns.
   * **Git Integration**: Merged work back to `main` locally, removed the worktree, and deleted the local branch.
+
+---
+
+## 3. Phase 11: Architecture Remaster & Code Styling Enforcement
+
+To ensure codebase compliance with [gemini.md](file:///D:/TeamTask/gemini.md) and improve performance, we executed a complete refactoring of the request validation and state synchronization layer.
+
+### Task 1: Enforce Strict Code Styling & Naming Conventions
+* **Details**: Verified that all backend files (Models, Controllers, Requests) use PascalCase naming, and frontend files (Components, Pages) use PascalCase, with hooks and services using camelCase, while directories use lowercase/kebab-case. Excluded mass-assignment variables from default model updates.
+
+### Task 2: Controller Validation Decoupling (Form Requests)
+* **Files Created**:
+  * `backend/app/Http/Requests/Api/StoreUserRequest.php`
+  * `backend/app/Http/Requests/Api/UpdateUserStatusRequest.php`
+  * `backend/app/Http/Requests/Api/AdminUpdateUserRequest.php`
+  * `backend/app/Http/Requests/Api/UpdateTaskRequest.php` (supports dynamic rules per active user role)
+  * `backend/app/Http/Requests/Api/StoreCommentRequest.php`
+  * `backend/app/Http/Requests/Api/LoginRequest.php`
+* **Files Modified**:
+  * `backend/app/Http/Controllers/Api/UserController.php`
+  * `backend/app/Http/Controllers/Api/TaskController.php`
+  * `backend/app/Http/Controllers/Api/AuthController.php`
+* **Details**:
+  * Extracted all inline validation logic (`$request->validate()`) from controller methods into dedicated Form Request classes.
+  * Thin controllers now immediately fetch validated inputs (`$request->validated()`) and delegate to model operations.
+  * Enabled Fast-Fail validation: Invalid requests abort at the Laravel router layer before instantiating controllers, optimizing memory utilization.
+
+### Task 3: Local MySQL Database Provisioning
+* **Files Modified**: `backend/.env`
+* **Details**: Reconfigured the application's environment parameters back to MySQL connection details now that the local MySQL service is running. Created the database automatically and seeded it (`php artisan migrate:fresh --seed`).
+
+### Task 4: Frontend State Caching & Flicker Resolution
+* **Files Modified**:
+  * `frontend/src/context/AuthContext.jsx`
+  * `frontend/src/pages/EmployeeBoard.jsx`
+  * `frontend/src/pages/AdminDashboard.jsx`
+* **Details**:
+  * Added `cachedUserId` to `AuthContext` to log which user the active tasks cache belongs to.
+  * Checked `cachedUserId !== user.id` in both dashboards to synchronously trigger the spinner, preventing the browser from rendering the previous user's tasks for one frame during page transitions.
+  * Avoided concurrent mounting race conditions by ensuring background refresh is only called when `refreshKey > 0` (preventing mount-time fetches).
+  * Added `lastUserRef` in the context's `user` watch hook to block duplicate full-dashboard re-fetches when only user metadata (such as availability status) changes.
+
