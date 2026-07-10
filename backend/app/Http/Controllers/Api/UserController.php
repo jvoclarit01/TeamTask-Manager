@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Enum;
 use App\Enums\AvailabilityStatus;
+use App\Http\Requests\Api\StoreUserRequest;
+use App\Http\Requests\Api\UpdateUserStatusRequest;
+use App\Http\Requests\Api\AdminUpdateUserRequest;
 
 class UserController extends Controller {
     public function index(Request $request): JsonResponse {
@@ -24,13 +27,8 @@ class UserController extends Controller {
         return response()->json($employees);
     }
 
-    public function store(Request $request): JsonResponse {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'role' => 'required|string|in:admin,employee',
-        ]);
+    public function store(StoreUserRequest $request): JsonResponse {
+        $validated = $request->validated();
 
         $user = User::create([
             'name' => $validated['name'],
@@ -51,14 +49,12 @@ class UserController extends Controller {
         ], 201);
     }
 
-    public function updateStatus(Request $request, User $user): JsonResponse {
+    public function updateStatus(UpdateUserStatusRequest $request, User $user): JsonResponse {
         if ($request->user()->id !== $user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $validated = $request->validate([
-            'availability_status' => ['required', new Enum(AvailabilityStatus::class)],
-        ]);
+        $validated = $request->validated();
 
         $user->availability_status = $validated['availability_status'];
         $user->save();
@@ -69,12 +65,8 @@ class UserController extends Controller {
         ]);
     }
 
-    public function adminUpdate(Request $request, User $user): JsonResponse {
-        $validated = $request->validate([
-            'is_active' => 'sometimes|boolean',
-            'skills' => 'sometimes|array',
-            'skills.*' => 'string|max:50',
-        ]);
+    public function adminUpdate(AdminUpdateUserRequest $request, User $user): JsonResponse {
+        $validated = $request->validated();
 
         if ($request->user()->id === $user->id && isset($validated['is_active']) && !$validated['is_active']) {
             return response()->json(['message' => 'You cannot deactivate your own account.'], 403);

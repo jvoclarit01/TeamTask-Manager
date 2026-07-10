@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Api\StoreTaskRequest;
+use App\Http\Requests\Api\UpdateTaskRequest;
+use App\Http\Requests\Api\StoreCommentRequest;
 use Illuminate\Validation\Rule;
 
 class TaskController extends Controller
@@ -43,7 +45,7 @@ class TaskController extends Controller
     }
 
     // Update a task (Admin: full update; Employee: status only)
-    public function update(Request $request, Task $task)
+    public function update(UpdateTaskRequest $request, Task $task)
     {
         $user = $request->user();
 
@@ -53,9 +55,7 @@ class TaskController extends Controller
                 return response()->json(['message' => 'Forbidden'], 403);
             }
 
-            $validated = $request->validate([
-                'status' => 'required|in:pending,in_progress,completed',
-            ]);
+            $validated = $request->validated();
 
             $task->update(['status' => $validated['status']]);
             return $task->load('users');
@@ -63,17 +63,7 @@ class TaskController extends Controller
 
         if ($user->hasRole('admin')) {
             // Admin full update
-            $validated = $request->validate([
-                'title'       => 'sometimes|string|max:255',
-                'description' => 'nullable|string',
-                'due_date'    => 'nullable|date',
-                'user_ids'    => 'sometimes|array|min:1',
-                'user_ids.*'  => [
-                    Rule::exists('users', 'id')->where('is_active', true)
-                ],
-                'priority'    => 'nullable|in:low,medium,high',
-                'status'      => 'nullable|in:pending,in_progress,completed',
-            ]);
+            $validated = $request->validated();
 
             DB::transaction(function () use ($task, $validated) {
                 if (isset($validated['user_ids'])) {
@@ -126,7 +116,7 @@ class TaskController extends Controller
     }
 
     // Add a comment to a task
-    public function addComment(Request $request, Task $task)
+    public function addComment(StoreCommentRequest $request, Task $task)
     {
         $user = $request->user();
 
@@ -135,9 +125,7 @@ class TaskController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        $validated = $request->validate([
-            'content' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $comment = $task->comments()->create([
             'user_id' => $user->id,
