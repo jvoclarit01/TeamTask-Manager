@@ -52,7 +52,7 @@ const EmployeeBoard = () => {
   };
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && refreshKey > 0) {
       refreshCache(false); // background refresh
     }
   }, [user, refreshKey, refreshCache]);

@@ -158,7 +158,9 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    refreshCache(false); // background refresh
+    if (refreshKey > 0) {
+      refreshCache(false); // background refresh
+    }
   }, [refreshKey, refreshCache]);
 
   const handleSubmit = async (e) => {
