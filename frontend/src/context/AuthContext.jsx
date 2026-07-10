@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
   const [employees, setEmployees] = useState([]);
   const [tasksLoading, setTasksLoading] = useState(false);
   const [employeesLoading, setEmployeesLoading] = useState(false);
+  const [cachedUserId, setCachedUserId] = useState(() => user?.id || null);
 
   const activeUserIdRef = useRef(user?.id);
 
@@ -81,6 +82,7 @@ export const AuthProvider = ({ children }) => {
       if (activeUserIdRef.current === fetchUserId) {
         setTasks(tasksRes.data);
         setEmployees(employeesRes.data);
+        setCachedUserId(fetchUserId);
 
         const currentUserDetails = employeesRes.data.find(emp => emp.id === user.id);
         if (currentUserDetails && currentUserDetails.availability_status !== user.availability_status) {
@@ -106,6 +108,7 @@ export const AuthProvider = ({ children }) => {
   const clearCache = useCallback((shouldSetLoading = false) => {
     setTasks([]);
     setEmployees([]);
+    setCachedUserId(null);
     setTasksLoading(shouldSetLoading);
     setEmployeesLoading(shouldSetLoading);
   }, []);
@@ -209,6 +212,7 @@ export const AuthProvider = ({ children }) => {
         employees,
         tasksLoading,
         employeesLoading,
+        cachedUserId,
         refreshCache,
         clearCache,
       }}

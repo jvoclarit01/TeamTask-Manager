@@ -13,20 +13,21 @@ import TaskCard from '../components/TaskCard';
 
 const AdminDashboard = () => {
   const { 
-    searchQuery, 
-    addNotification,
-    tasks,
-    employees,
-    tasksLoading,
-    employeesLoading,
-    refreshCache 
+    user, 
+    tasks, 
+    tasksLoading, 
+    employees, 
+    employeesLoading, 
+    cachedUserId,
+    refreshCache, 
+    addNotification 
   } = useAuth();
 
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   
   // Calculate dynamic loading state
-  const loading = (tasks.length === 0 && tasksLoading) || (employees.length === 0 && employeesLoading);
+  const loading = tasksLoading || employeesLoading || cachedUserId !== user?.id;
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');

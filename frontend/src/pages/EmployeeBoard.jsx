@@ -13,6 +13,7 @@ const EmployeeBoard = () => {
     addNotification,
     tasks,
     tasksLoading,
+    cachedUserId,
     refreshCache,
     updateUserSession
   } = useAuth();
@@ -20,7 +21,7 @@ const EmployeeBoard = () => {
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   
-  const loading = tasks.length === 0 && tasksLoading;
+  const loading = tasksLoading || cachedUserId !== user?.id;
   const [refreshKey, setRefreshKey] = useState(0);
   const [collapsedSections, setCollapsedSections] = useState({});
   const [status, setStatus] = useState(user?.availability_status || 'active');
