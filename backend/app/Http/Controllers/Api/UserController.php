@@ -33,7 +33,7 @@ class UserController extends Controller {
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make(\Illuminate\Support\Str::random(40)),
         ]);
 
         $user->assignRole($validated['role']);

@@ -1,0 +1,48 @@
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - img [ref=e6]
+    - heading "SYNERGY" [level=4] [ref=e9]
+    - generic [ref=e10]: ALIGN. EXECUTE. SCALE.
+    - generic [ref=e11]:
+      - paragraph [ref=e12]: Welcome back, Admin
+      - generic [ref=e13]: "Active Role: Administrator"
+  - generic [ref=e16]:
+    - generic [ref=e18]:
+      - img [ref=e19]
+      - heading "SYNERGY HRMS" [level=6] [ref=e22]
+    - list [ref=e23]:
+      - listitem [ref=e24]:
+        - link "Tasks (Active)" [ref=e25] [cursor=pointer]:
+          - /url: /admin/dashboard
+          - img [ref=e27]
+          - generic [ref=e30]: Tasks (Active)
+  - generic [ref=e31]:
+    - generic [ref=e32]:
+      - generic [ref=e34]:
+        - img [ref=e35]
+        - textbox "Search employees, tasks..." [ref=e38]
+      - generic [ref=e39]:
+        - paragraph [ref=e40]: "View as:"
+        - group [ref=e41]:
+          - button "Admin" [pressed] [ref=e42] [cursor=pointer]
+          - button "Employee" [ref=e43] [cursor=pointer]
+      - generic [ref=e44]:
+        - button [ref=e45] [cursor=pointer]:
+          - img [ref=e47]
+        - generic [ref=e49] [cursor=pointer]:
+          - generic [ref=e50]:
+            - paragraph [ref=e51]: Admin
+            - generic [ref=e52]: Admin
+          - generic [ref=e53]: A
+    - progressbar [ref=e56]:
+      - img [ref=e57]
+    - contentinfo [ref=e59]:
+      - generic [ref=e60]:
+        - paragraph [ref=e61]: © 2026 Workload Hub. All rights reserved.
+        - generic [ref=e62]:
+          - link "Privacy Policy" [ref=e63] [cursor=pointer]:
+            - /url: "#"
+          - link "Terms of Service" [ref=e64] [cursor=pointer]:
+            - /url: "#"
+          - link "Support" [ref=e65] [cursor=pointer]:
+            - /url: "#"

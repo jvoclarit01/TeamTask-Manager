@@ -106,7 +106,6 @@ class SecurityTest extends TestCase
     {
         $response = $this->postJson('/api/login', [
             'email' => 'bob@company.com',
-            'password' => 'password',
         ]);
 
         $response->assertStatus(200)
@@ -117,12 +116,10 @@ class SecurityTest extends TestCase
     {
         $inactiveEmployee = User::factory()->inactive()->create([
             'email' => 'inactive@company.com',
-            'password' => bcrypt('password123'),
         ]);
 
         $response = $this->postJson('/api/login', [
             'email' => 'inactive@company.com',
-            'password' => 'password123',
         ]);
 
         $response->assertStatus(403)

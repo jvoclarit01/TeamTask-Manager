@@ -47,7 +47,7 @@ const AdminDashboard = () => {
   const [openAddUser, setOpenAddUser] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [newUserEmail, setNewUserEmail] = useState('');
-  const [newUserPassword, setNewUserPassword] = useState('');
+
   const [newUserRole, setNewUserRole] = useState('employee');
   const [addUserError, setAddUserError] = useState('');
   const [addingUser, setAddingUser] = useState(false);
@@ -202,12 +202,8 @@ const AdminDashboard = () => {
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
-    if (!newUserName.trim() || !newUserEmail.trim() || !newUserPassword.trim()) {
+    if (!newUserName.trim() || !newUserEmail.trim()) {
       setAddUserError('All fields are required.');
-      return;
-    }
-    if (newUserPassword.length < 8) {
-      setAddUserError('Password must be at least 8 characters.');
       return;
     }
 
@@ -218,7 +214,6 @@ const AdminDashboard = () => {
       await createUser({
         name: newUserName,
         email: newUserEmail,
-        password: newUserPassword,
         role: newUserRole,
       });
 
@@ -228,7 +223,6 @@ const AdminDashboard = () => {
       // Reset Form
       setNewUserName('');
       setNewUserEmail('');
-      setNewUserPassword('');
       setNewUserRole('employee');
       setOpenAddUser(false);
     } catch (err) {
@@ -246,7 +240,6 @@ const AdminDashboard = () => {
   const handleCancelAddUser = () => {
     setNewUserName('');
     setNewUserEmail('');
-    setNewUserPassword('');
     setNewUserRole('employee');
     setAddUserError('');
     setOpenAddUser(false);
@@ -1481,30 +1474,6 @@ const AdminDashboard = () => {
               required
             />
 
-            <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
-              Password
-            </Typography>
-            <TextField
-              fullWidth
-              type="password"
-              placeholder="At least 8 characters..."
-              variant="outlined"
-              value={newUserPassword}
-              onChange={(e) => setNewUserPassword(e.target.value)}
-              sx={{
-                mb: 3,
-                '& .MuiOutlinedInput-root': {
-                  background: '#0b0f19',
-                  borderRadius: '10px',
-                  '& fieldset': { borderColor: '#1c253d' },
-                  '&:hover fieldset': { borderColor: '#2e3b5e' },
-                  '&.Mui-focused fieldset': { borderColor: '#10b981' },
-                },
-                '& input': { py: 1.5, fontSize: '0.85rem', color: '#f8fafc' },
-                '& input::placeholder': { color: '#64748b', opacity: 1 }
-              }}
-              required
-            />
 
             <Typography variant="body2" sx={{ color: '#e2e8f0', display: 'block', mb: 1, fontWeight: 600, fontSize: '0.85rem' }}>
               System Role
