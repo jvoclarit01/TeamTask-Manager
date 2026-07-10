@@ -99,6 +99,9 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('last_authenticated_user_id');
       }
       console.error('Failed to update dashboard cache', err);
+      if (activeUserIdRef.current === fetchUserId) {
+        setCachedUserId(fetchUserId); // Release loading state on connection/API error
+      }
     } finally {
       if (activeUserIdRef.current === fetchUserId) {
         setTasksLoading(false);
