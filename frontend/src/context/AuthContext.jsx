@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
-import { getTasks, getEmployees, getMyTasks, login as apiLogin, setAuthToken } from '../services/apiService';
+import { getTasks, getEmployees, getMyTasks, login as apiLogin, loginAs, setAuthToken } from '../services/apiService';
 
 const AuthContext = createContext(null);
 
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
       let token = cachedTokens[user.id];
       
       if (!token) {
-        const loginRes = await apiLogin({ email: user.email, password: 'password123' });
+        const loginRes = await loginAs(user.id);
         token = loginRes.data.token;
         cachedTokens[user.id] = token;
         localStorage.setItem('user_tokens', JSON.stringify(cachedTokens));

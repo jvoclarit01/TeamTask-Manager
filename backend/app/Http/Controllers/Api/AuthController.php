@@ -44,6 +44,29 @@ class AuthController extends Controller
         ]);
     }
 
+    public function loginAs(User $user)
+    {
+        if (!$user->is_active) {
+            return response()->json([
+                'message' => 'Your account has been deactivated. Please contact an admin.'
+            ], 403);
+        }
+
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->roles->first()?->name,
+                'availability_status' => $user->availability_status,
+                'skills' => $user->skills,
+            ],
+            'token' => $token,
+        ]);
+    }
+
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

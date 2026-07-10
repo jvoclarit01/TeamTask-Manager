@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public auth routes
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login-as/{user}', [AuthController::class, 'loginAs']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);

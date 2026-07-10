@@ -32,6 +32,7 @@ if (authToken) {
 
 // Auth endpoints
 export const login = (credentials) => api.post('/login', credentials);
+export const loginAs = (userId) => api.post(`/login-as/${userId}`);
 export const logout = () => api.post('/logout');
 export const getCurrentUser = () => api.get('/user');
 
