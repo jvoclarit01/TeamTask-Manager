@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }) => {
   const [cachedUserId, setCachedUserId] = useState(() => user?.id || null);
 
   const activeUserIdRef = useRef(user?.id);
+  const lastUserRef = useRef(null);
 
   useEffect(() => {
     activeUserIdRef.current = user?.id;
@@ -48,6 +49,7 @@ export const AuthProvider = ({ children }) => {
   const refreshCache = useCallback(async (showLoadingSpinner = false) => {
     if (!user) return;
     const fetchUserId = user.id;
+    console.log('[AuthContext] refreshCache start: showLoadingSpinner =', showLoadingSpinner, 'user =', user?.id);
     
     if (showLoadingSpinner) {
       setTasksLoading(true);
@@ -106,6 +108,7 @@ export const AuthProvider = ({ children }) => {
   }, [user, updateUserSession]);
 
   const clearCache = useCallback((shouldSetLoading = false) => {
+    console.log('[AuthContext] clearCache: shouldSetLoading =', shouldSetLoading);
     setTasks([]);
     setEmployees([]);
     setCachedUserId(null);
@@ -115,10 +118,17 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      Promise.resolve().then(() => {
-        refreshCache(true);
-      });
+      const idChanged = !lastUserRef.current || lastUserRef.current.id !== user.id;
+      const roleChanged = !lastUserRef.current || lastUserRef.current.role !== user.role;
+      
+      if (idChanged || roleChanged) {
+        lastUserRef.current = { id: user.id, role: user.role };
+        Promise.resolve().then(() => {
+          refreshCache(true);
+        });
+      }
     } else {
+      lastUserRef.current = null;
       Promise.resolve().then(() => {
         clearCache(false);
       });

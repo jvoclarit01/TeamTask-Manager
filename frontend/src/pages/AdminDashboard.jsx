@@ -28,7 +28,7 @@ const AdminDashboard = () => {
   
   // Calculate dynamic loading state
   const loading = tasksLoading || employeesLoading || cachedUserId !== user?.id;
-
+  console.log('[AdminDashboard] render: tasksLoading =', tasksLoading, 'employeesLoading =', employeesLoading, 'tasks.length =', tasks.length, 'employees.length =', employees.length, 'cachedUserId =', cachedUserId, 'user.id =', user?.id, 'loading =', loading);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [assignedUserIds, setAssignedUserIds] = useState([]);

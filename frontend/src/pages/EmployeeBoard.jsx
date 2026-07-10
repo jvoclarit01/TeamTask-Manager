@@ -22,6 +22,7 @@ const EmployeeBoard = () => {
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   
   const loading = tasksLoading || cachedUserId !== user?.id;
+  console.log('[EmployeeBoard] render: tasksLoading =', tasksLoading, 'tasks.length =', tasks.length, 'cachedUserId =', cachedUserId, 'user.id =', user?.id, 'loading =', loading);
   const [refreshKey, setRefreshKey] = useState(0);
   const [collapsedSections, setCollapsedSections] = useState({});
   const [status, setStatus] = useState(user?.availability_status || 'active');
