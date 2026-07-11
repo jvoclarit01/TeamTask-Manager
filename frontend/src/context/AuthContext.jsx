@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
-import { getTasks, getEmployees, getMyTasks, login as apiLogin, loginAs, setAuthToken } from '../services/apiService';
+import { getTasks, getEmployees, getMyTasks, loginAs, setAuthToken } from '../services/apiService';
 
 const AuthContext = createContext(null);
 

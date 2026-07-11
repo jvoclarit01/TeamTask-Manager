@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, TextField, Button, MenuItem, Select, FormControl, OutlinedInput, Checkbox, ListItemText, Typography, CircularProgress, Chip, Dialog, Popover, Radio, RadioGroup, FormControlLabel, Pagination, IconButton, useMediaQuery, useTheme, Switch, LinearProgress, Menu } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -20,7 +20,8 @@ const AdminDashboard = () => {
     employeesLoading, 
     cachedUserId,
     refreshCache, 
-    addNotification 
+    addNotification,
+    searchQuery
   } = useAuth();
 
   const muiTheme = useTheme();

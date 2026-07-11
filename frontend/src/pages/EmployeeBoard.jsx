@@ -27,11 +27,13 @@ const EmployeeBoard = () => {
   const [collapsedSections, setCollapsedSections] = useState({});
   const [status, setStatus] = useState(user?.availability_status || 'active');
 
-  useEffect(() => {
+  const [prevUser, setPrevUser] = useState(user);
+  if (user !== prevUser) {
+    setPrevUser(user);
     if (user?.availability_status) {
       setStatus(user.availability_status);
     }
-  }, [user]);
+  }
 
   const handleAvailabilityStatusChange = async (e) => {
     const newStatus = e.target.value;
