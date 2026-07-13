@@ -10,7 +10,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer';
 import { getEmployees } from './services/apiService';
-import SynergyLogo from './components/SynergyLogo';
+
 import WelcomeOverlay from './components/WelcomeOverlay';
 
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
@@ -131,7 +131,6 @@ const SidebarAndHeaderLayout = ({ children }) => {
           {/* Logo */}
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.5, mb: { xs: 2, md: 4 }, px: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <SynergyLogo size={32} />
               <Typography variant="h6" sx={{ fontWeight: 900, fontFamily: '"Outfit", sans-serif', color: '#10b981', letterSpacing: '0.5px', fontSize: '1.05rem' }}>
                 SYNERGY <span style={{ color: '#94a3b8', fontWeight: 500 }}>HRMS</span>
               </Typography>
