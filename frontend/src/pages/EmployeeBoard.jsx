@@ -40,7 +40,11 @@ const EmployeeBoard = () => {
     setStatus(newStatus);
     try {
       await updateEmployeeStatus(user.id, newStatus);
-      addNotification('Status Updated', `Your availability is now set to ${newStatus.toUpperCase()}`);
+      if (newStatus === 'ooo') {
+        addNotification('Status Updated', `${user?.name || 'Employee'} is now on leave`);
+      } else {
+        addNotification('Status Updated', `Your availability is now set to ${newStatus.toUpperCase()}`);
+      }
       updateUserSession({ availability_status: newStatus });
       refreshCache(true);
     } catch (err) {
